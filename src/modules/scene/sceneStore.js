@@ -1,6 +1,7 @@
 // export const REDUCER_STORE_NAME = 'scene'
 export const CONSTANTS = {
   STORE_NAME: 'scene',
+  CONTROLS_ATTACHED: 'scene/CONTROLS_ATTACHED',
   SELECT_SYSTEM: 'scene/SELECT_SYSTEM'
 }
 
@@ -34,5 +35,8 @@ export const selectors = {
 export const actions = {
   select(payload) {
     return { type: CONSTANTS.SELECT_SYSTEM, payload }
+  },
+  controlsAttached() {
+    return { type: CONSTANTS.CONTROLS_ATTACHED }
   }
 }

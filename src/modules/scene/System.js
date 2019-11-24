@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 import * as THREE from 'three'
 import { useThree, useFrame } from 'react-three-fiber'
 
@@ -6,8 +6,10 @@ import { getStore } from '../../store'
 import { selectors, actions } from './sceneStore'
 // import { actions } from './sceneStore'
 import Star from './Star'
+import Planet from './Planet'
 import Text from './Text'
 import Orbit from './Orbit'
+import SystemGlow from './SystemGlow'
 
 const store = getStore()
 
@@ -32,7 +34,7 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
     () =>
       selected &&
       binaryRef.current &&
-      (binaryRef.current.rotation.y = binaryRef.current.rotation.y += 0.001)
+      (binaryRef.current.rotation.y = binaryRef.current.rotation.y -= 0.001)
   )
 
   const ref = useRef()
@@ -60,8 +62,8 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
         // new THREE.Vector3(position.x, position.y, position.z),
         // null,
         Math.abs(lookAt.theta),
-        // null,
-        Math.abs(lookAt.phi),
+        null,
+        // Math.abs(lookAt.phi),
         15, // radius
         4000
       )
@@ -74,11 +76,18 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
     <group
       ref={ref}
       position={[position.x, position.y, position.z]}
+      scale={[selected ? 1 : 0.5, selected ? 1 : 0.5, selected ? 1 : 0.5]}
       // onClick={e => {
       //   e.stopPropagation()
       //   store.dispatch(actions.select(system.code))
       // }}
     >
+      {!selected && (
+        <Suspense fallback={null}>
+          <SystemGlow color={stars[0].color} />
+        </Suspense>
+      )}
+
       {selected && (
         <>
           <Text
@@ -126,14 +135,23 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
                 color: new THREE.Color('gray'),
                 transparent: true,
                 wireframe: true,
-                opacity: 0.1
+                opacity: 0.08
               })
             }
             // visible={hovered || selected}
           />
-          <Orbit radius={5} color={'white'} />
+          <Orbit radius={4} color={'#1e88e5'} idx={2}>
+            <Planet color={'brown'} />
+          </Orbit>
+          <Orbit radius={6} color={'#1e88e5'} idx={1}>
+            <Planet color={'aqua'} />
+            <Orbit radius={1} color={'#1e88e5'} idx={2}>
+              <Planet color={'slategray'} scale={0.5} />
+            </Orbit>
+          </Orbit>
         </>
       )}
+
       <group>
         {/* {((selected && stars.length === 1) || !selected) && ( */}
         {stars.length === 1 && <Star {...stars[0]} key={stars[0].code} />}
@@ -146,7 +164,8 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
                 key={star.code}
                 code={star.code}
                 scale={starIdx ? 0.5 : 1}
-                position={[-(starIdx ? 1.5 : -1) * 2, 0, 0]}
+                // opacity={selected ? 1 : 0.3}
+                position={[-(starIdx ? 1.5 : -1) * 1, 0, 0]}
                 // position={[-(!starIdx ? -1 : 1) * 2, -(!starIdx ? -1 : 1) * 2, 0]}
                 // color={star.color}
               />

@@ -50,7 +50,10 @@ export function reducer(state = initialState, action) {
 async function generate(dispatch, generator) {
   console.log('> start generator', generator)
 
-  const galaxy = new Galaxy(generator)
+  const galaxy = new Galaxy({
+    ...generator,
+    buildData: { ...(generator.buildData || {}) }
+  })
   dispatch(actions.updateGalaxy(galaxy))
 
   const systemsTemp = []

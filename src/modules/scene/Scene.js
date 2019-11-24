@@ -19,10 +19,11 @@ import { generatorActions } from '../generator'
 // import useStore, { useSelectedSystem } from "../store";
 import Star from './Star'
 import System from './System'
+import { actions } from './sceneStore'
 
 extend({ OrbitControls })
 
-export const Controls = ({ ...props }) => {
+export const Controls = ({ onAttach = () => {}, ...props }) => {
   const { gl, camera } = useThree()
   const controls = useRef()
   useRender((state, delta) => {
@@ -32,7 +33,12 @@ export const Controls = ({ ...props }) => {
     }
   })
   useEffect(() => {
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const containerWidth = 300
     camera.controls = controls.current
+    camera.setViewOffset(width, height, -(containerWidth / 2), 0, width, height)
+    onAttach()
     // console.log('controls', camera, controls)
     // camera&&control ? (camera.controls = controls.current) : ''
   }, [camera])
@@ -50,7 +56,8 @@ export function Scene({
   generator,
   updateGalaxy,
   updateSystem,
-  initGenerator
+  initGenerator,
+  controlsAttached
 }) {
   // const { fov } = useStore(state => state.mutation);
   // const [selectedSystem, setSelectedSystem] = useSelectedSystem();
@@ -82,7 +89,7 @@ export function Scene({
       // ref={canvasRef}
       // onPointerMove={actions.updateMouse}
       // onClick={actions.shoot}
-      camera={{ position: [0, 0, 50], near: 0.01, far: 10000, fov }}
+      camera={{ position: [0, 50, 50], near: 0.01, far: 10000, fov }}
       onCreated={({ gl, camera }) => {
         console.log('onCreated')
         // actions.init(camera);
@@ -92,7 +99,13 @@ export function Scene({
       }}
     >
       <scene>
-        <Controls enableDamping rotateSpeed={0.3} dampingFactor={0.1} />
+        <Controls
+          onAttach={() => controlsAttached()}
+          enableDamping
+          rotateSpeed={0.3}
+          dampingFactor={0.1}
+        />
+        <ambientLight intensity={0.25} color="white" />
         <group ref={groupRef}>
           {/* <fog attach="fog" args={["black", 100, 700]} /> */}
           {/* <ambientLight intensity={0.25} /> */}
@@ -123,5 +136,5 @@ export default connect(
     systems: (state.generator && state.generator.systems) || [],
     generator: state.generator.settings
   }),
-  dispatch => bindActionCreators({ ...generatorActions }, dispatch)
+  dispatch => bindActionCreators({ ...generatorActions, ...actions }, dispatch)
 )(Scene)

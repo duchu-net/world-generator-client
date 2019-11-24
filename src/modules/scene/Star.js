@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import React, { useRef, useState, useEffect } from 'react'
 import { a } from 'react-spring/three'
+import starImg from './assets/sunmap.jpg'
+import moonImg from './assets/moon_surface.png'
 // import earthImg from '../images/earth.jpg'
 // import moonImg from '../images/moon.png'
 // import { useSelectedSystem } from "../store";
@@ -8,13 +10,24 @@ import Text from './Text'
 
 import { getStore } from '../../store'
 import { selectors } from './sceneStore'
-import { useThree } from 'react-three-fiber'
+import { useThree, useLoader } from 'react-three-fiber'
 
 const store = getStore()
 
-export default function Star({ position, color, scale = 1, ...props }) {
+function Glow({}) {
+  return 'skadj'
+}
+
+export default function Star({
+  position,
+  color,
+  scale = 1,
+  opacity = 1,
+  ...props
+}) {
   const [selected, setSelected] = useState(false)
   useEffect(() => {
+    // console.log(props)
     const unsubscribe = store.subscribe(() => {
       setSelected(selectors.getSelected(store.getState()) === props.code)
     })
@@ -66,6 +79,9 @@ export default function Star({ position, color, scale = 1, ...props }) {
 
   // console.log("<>", props);
   // const [texture, moon] = useLoader(THREE.TextureLoader, [earthImg, moonImg])
+
+  // const [texture, moon] = useLoader(THREE.TextureLoader, [starImg, moonImg])
+
   return (
     <group
       ref={ref}
@@ -77,7 +93,7 @@ export default function Star({ position, color, scale = 1, ...props }) {
           frontToCamera
           color="white"
           size={0.5}
-          position={[0, 5, 0]}
+          position={[0, 1.5, 0]}
           // rotation={[-Math.PI / 2, 0, 0]}
           children={props.code.split('.').slice(-1)[0]}
           // visible={hovered || selected}
@@ -99,11 +115,31 @@ export default function Star({ position, color, scale = 1, ...props }) {
           // visible={hovered || selected}
         />
       )}
-      {/* <mesh>
-        <sphereBufferGeometry attach="geometry" args={[5, 32, 32]} />
-        <meshStandardMaterial attach="material" map={texture} roughness={1} fog={false} />
-      </mesh>
-      <mesh position={[5, -5, -5]}>
+
+      {/* {selected && texture && (
+        <mesh position={[0, 0, 0]}>
+          <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} />
+          <meshStandardMaterial
+            roughness={1}
+            attach="material"
+            color={color || '#FFFF99'}
+            map={texture}
+            fog={false}
+          />
+        </mesh>
+        // <mesh
+        //   scale={[scale, scale, scale]}
+        //   material={
+        //     new THREE.MeshPhongMaterial({
+        //       map: texture
+        //       // side: THREE.FrontSide
+        //     })
+        //   }
+        //   geometry={new THREE.SphereGeometry(1, 32, 32)}
+        // />
+      )} */}
+
+      {/* <mesh position={[5, -5, -5]}>
         <sphereBufferGeometry attach="geometry" args={[0.75, 32, 32]} />
         <meshStandardMaterial attach="material" roughness={1} map={moon} fog={false} />
       </mesh> */}
@@ -138,7 +174,7 @@ export default function Star({ position, color, scale = 1, ...props }) {
         // geometry={new THREE.IcosahedronGeometry(1, 1)}
         geometry={
           new THREE.SphereBufferGeometry(
-            1,
+            selected ? 1 : 1,
             selected ? 32 : 16,
             selected ? 32 : 16
           )
@@ -152,8 +188,9 @@ export default function Star({ position, color, scale = 1, ...props }) {
           attach="material"
           color={color || '#FFFF99'}
           fog={false}
+          opacity={opacity}
         />
-        <pointLight distance={6100} intensity={50} color="white" />
+        {/* <pointLight distance={100} intensity={1} color="white" /> */}
       </a.mesh>
     </group>
   )

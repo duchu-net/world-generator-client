@@ -4,6 +4,7 @@ import { useThree, useFrame } from 'react-three-fiber'
 import fontFile from './assets/sans'
 
 export default function Orbit({
+  idx = 1,
   opacity = 0.3,
   radius = 1,
   color = '#000000',
@@ -11,6 +12,7 @@ export default function Orbit({
   // size = 1,  color = '#000000',
   // centerX = true,
   // centerY = true,
+  children,
   ...props
 }) {
   const groupRef = useRef()
@@ -47,37 +49,52 @@ export default function Orbit({
     ]
   }, [radius])
 
-  // useFrame(
-  //   ({ camera }) => frontToCamera && groupRef.current.lookAt(camera.position)
-  //   // () => (groupRef.current.rotation.x = groupRef.current.rotation.y += 0.01)
-  // )
+  const pivotRef = useRef()
+
+  useFrame(
+    //   ({ camera }) => frontToCamera && groupRef.current.lookAt(camera.position)
+    () =>
+      (pivotRef.current.rotation.z = pivotRef.current.rotation.z += 0.002 * idx)
+  )
 
   return (
     <group
       {...props}
       ref={groupRef}
-      rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
+      // rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
     >
-      <lineLoop
-        position={new THREE.Vector3(0, 0, 0)}
-        geometry={geometry}
-        material={
-          new THREE.LineBasicMaterial({
-            color,
-            opacity,
-            linewidth,
-            transparent: opacity === 0 ? false : true
-          })
-        }
-      >
-        {/* <geometry vertices={points.vertices} /> */}
-        {/* <lineBasicMaterial
+      <group>
+        <lineLoop
+          rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
+          ref={pivotRef}
+          position={new THREE.Vector3(0, 0, 0)}
+          geometry={geometry}
+          material={
+            new THREE.LineBasicMaterial({
+              color,
+              opacity,
+              linewidth,
+              transparent: opacity === 0 ? false : true
+            })
+          }
+        >
+          {children && (
+            <group
+              position={new THREE.Vector3(radius, 0, 0)}
+              rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
+            >
+              {children}
+            </group>
+          )}
+          {/* <geometry vertices={points.vertices} /> */}
+          {/* <lineBasicMaterial
           color={new THREE.Color(color)}
           transparent
           opacity={opacity}
           linewidth={5}
         /> */}
-      </lineLoop>
+        </lineLoop>
+      </group>
     </group>
   )
 }
