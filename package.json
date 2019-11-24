@@ -1,17 +1,23 @@
 {
-  "name": "new",
+  "name": "world-generator-with-react",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "@babel/core": "7.7.4",
+    "@babel/plugin-proposal-optional-chaining": "7.7.4",
     "react": "16.8.6",
     "react-dom": "16.8.6",
+    "react-redux": "7.1.3",
     "react-scripts": "3.0.1",
+    "react-spring-three": "1.0.4",
     "react-three-fiber": "3.0.8",
-    "three": "0.110.0",
-    "zustand": "2.2.1",
-    "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator"
+    "redux": "4.0.4",
+    "three": "^0.109.0",
+    "tween": "0.9.0",
+    "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator",
+    "zustand": "2.2.1"
   },
   "devDependencies": {
     "typescript": "3.3.3"
@@ -22,5 +28,10 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
