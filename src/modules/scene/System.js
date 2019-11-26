@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useThree, useFrame } from 'react-three-fiber'
 
 import { getStore } from '../../store'
+import { generatorSelectors } from '../generator'
 import { selectors, actions } from './sceneStore'
 // import { actions } from './sceneStore'
 import Star from './Star'
@@ -13,57 +14,60 @@ import SystemGlow from './SystemGlow'
 
 const store = getStore()
 
-export function System({ system: { stars = [], position, ...system } = {} }) {
+export function System({ code }) {
+  /** system by code */
+  const [system, setSystem] = useState(
+    generatorSelectors.getSystemByCode(store.getState(), code)
+  )
+  /** selected, not default(?) */
   const [selected, setSelected] = useState(false)
+
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
-      const nextSelected = selectors.getSelected(store.getState())
-      setSelected(
-        nextSelected === system.code ||
-          // stars.findIndex(star => star.code === nextSelected) > -1
-          (typeof nextSelected === 'string' &&
-            nextSelected.startsWith(system.code + '.'))
-      )
+      const state = store.getState()
+      setSystem(generatorSelectors.getSystemByCode(state, code))
+      setSelected(selectors.isSystemSelected(state, code))
     })
     return () => {
       unsubscribe()
     }
   }, [])
 
+  /** Animation */
   useFrame(
     () =>
       selected &&
       binaryRef.current &&
-      (binaryRef.current.rotation.y = binaryRef.current.rotation.y -= 0.001)
+      (binaryRef.current.rotation.y = binaryRef.current.rotation.y += 0.001)
   )
 
   const ref = useRef()
   const { camera } = useThree()
+  const { stars = [], position = {} } = system || {}
+  const isStars = Boolean(stars.length)
+
+  /** On Select System */
   useEffect(() => {
-    if (selected) {
-      console.log('selected first time', camera.uuid)
+    if (selected && position) {
+      console.log('selected one time', code)
       /** @TODO the camera is shooting pirouettes when transfer between -/+ */
       const position = new THREE.Vector3()
       position.setFromMatrixPosition(ref.current.matrixWorld)
 
-      const lookAt = new THREE.Spherical()
+      const cameraRool = new THREE.Spherical()
 
       const target = position.clone()
       target.sub(position)
-      lookAt.setFromCartesianCoords(
+      cameraRool.setFromCartesianCoords(
         camera.position.x,
         camera.position.y,
         camera.position.z
       )
-      // console.log(target, lookAt, camera.position)
-
       camera.controls.cameraTo(
         position,
         // new THREE.Vector3(position.x, position.y, position.z),
-        // null,
-        Math.abs(lookAt.theta),
-        null,
-        // Math.abs(lookAt.phi),
+        Math.abs(cameraRool.theta),
+        null, // phi - null=default
         15, // radius
         4000
       )
@@ -79,10 +83,10 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
       scale={[selected ? 1 : 0.5, selected ? 1 : 0.5, selected ? 1 : 0.5]}
       // onClick={e => {
       //   e.stopPropagation()
-      //   store.dispatch(actions.select(system.code))
+      //   store.dispatch(actions.select(code))
       // }}
     >
-      {!selected && (
+      {!selected && isStars && (
         <Suspense fallback={null}>
           <SystemGlow color={stars[0].color} />
         </Suspense>
@@ -95,7 +99,7 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
             size={1}
             position={[0, 0, 10]}
             rotation={[-Math.PI / 2, 0, -Math.PI]}
-            children={system.code}
+            children={code}
             opacity={0.3}
             // visible={hovered || selected}
           />
@@ -104,7 +108,7 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
             size={1}
             position={[0, 0, -10]}
             rotation={[-Math.PI / 2, 0, 0]}
-            children={system.code}
+            children={code}
             opacity={0.3}
             // visible={hovered || selected}
           />
@@ -140,20 +144,25 @@ export function System({ system: { stars = [], position, ...system } = {} }) {
             }
             // visible={hovered || selected}
           />
-          <Orbit radius={4} color={'#1e88e5'} idx={2}>
-            <Planet color={'brown'} />
+          <Orbit radius={4} color={'#1e88e5'} idx={3}>
+            <Planet color={'brown'} scale={0.3} />
           </Orbit>
-          <Orbit radius={6} color={'#1e88e5'} idx={1}>
-            <Planet color={'aqua'} />
-            <Orbit radius={1} color={'#1e88e5'} idx={2}>
-              <Planet color={'slategray'} scale={0.5} />
+          <Orbit radius={6} color={'#1e88e5'} idx={2}>
+            <Planet color={'green'} scale={0.4} />
+            <Orbit radius={1} color={'#1e88e5'} idx={4}>
+              <Planet color={'slategray'} scale={0.16} />
             </Orbit>
+            <Orbit radius={1.5} color={'#1e88e5'} idx={2}>
+              <Planet color={'slategray'} scale={0.24} />
+            </Orbit>
+          </Orbit>
+          <Orbit radius={8} color={'#1e88e5'} idx={1}>
+            <Planet color={'aqua'} scale={0.3} />
           </Orbit>
         </>
       )}
 
       <group>
-        {/* {((selected && stars.length === 1) || !selected) && ( */}
         {stars.length === 1 && <Star {...stars[0]} key={stars[0].code} />}
         {stars.length === 2 && (
           <group ref={binaryRef}>

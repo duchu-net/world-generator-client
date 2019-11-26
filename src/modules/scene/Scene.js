@@ -14,12 +14,13 @@ import {
   // Scene
 } from 'react-three-fiber'
 // import { Galaxy } from 'xenocide-world-generator'
-import { generatorActions } from '../generator'
+import { generatorActions, generatorSelectors } from '../generator'
 // import Interface from "./interface/Interface";
 // import useStore, { useSelectedSystem } from "../store";
-import Star from './Star'
+// import Star from './Star'
 import System from './System'
 import { actions } from './sceneStore'
+import { sceneSelectors } from '.'
 
 extend({ OrbitControls })
 
@@ -51,44 +52,24 @@ export const Controls = ({ onAttach = () => {}, ...props }) => {
 }
 
 export function Scene({
-  fov,
-  systems,
-  generator,
-  updateGalaxy,
-  updateSystem,
+  settings: { fov },
+  systemCodes,
   initGenerator,
   controlsAttached
 }) {
-  // const { fov } = useStore(state => state.mutation);
-  // const [selectedSystem, setSelectedSystem] = useSelectedSystem();
-  // const [, setGalaxy] = useState({});
-  // const [counter, setCounter] = useState(0);
-  // const [, setSystems] = useState([]);
+  console.log('>', 'render scene', systemCodes.length)
 
   useEffect(() => {
     initGenerator()
     return () => {}
   }, [])
 
-  console.log('>', 'render scene', systems.length)
-
-  // const { size, setDefaultCamera } = useThree()
-  // useEffect(() => setDefaultCamera(camera.current), [])
-  // useRender(() => {
-  //   controls.current.obj.update()
-  // })
   const groupRef = useRef()
-  // const canvasRef = useRef();
-  // useFrame(
-  //   () => (groupRef.current.rotation.x = groupRef.current.rotation.y += 0.01)
-  // );
 
   return (
     <Canvas
       className="canvas"
       // ref={canvasRef}
-      // onPointerMove={actions.updateMouse}
-      // onClick={actions.shoot}
       camera={{ position: [0, 50, 50], near: 0.01, far: 10000, fov }}
       onCreated={({ gl, camera }) => {
         console.log('onCreated')
@@ -105,24 +86,12 @@ export function Scene({
           rotateSpeed={0.3}
           dampingFactor={0.1}
         />
-        <ambientLight intensity={0.25} color="white" />
+        <ambientLight intensity={0.1} color="white" />
         <group ref={groupRef}>
           {/* <fog attach="fog" args={["black", 100, 700]} /> */}
           {/* <ambientLight intensity={0.25} /> */}
-          {/* <Star /> */}
-          {/* <orbitControls ref={controls} /> */}
-          {/* <Star position={[0, 0, 3000]} /> */}
-          {systems.map((system, idx) => (
-            <System
-              key={
-                '' +
-                system.position.x +
-                system.position.y +
-                system.position.z +
-                system.code
-              }
-              system={system}
-            />
+          {systemCodes.map((code, idx) => (
+            <System key={code} code={code} />
           ))}
         </group>
       </scene>
@@ -130,11 +99,19 @@ export function Scene({
   )
 }
 
+const makeMapStateToProps = (initialState, initialProps) => {
+  const mapStateToProps = state => {
+    return {
+      settings: sceneSelectors.getSettings(state),
+      systemCodes: generatorSelectors.getSystemCodes(state)
+    }
+  }
+  return mapStateToProps
+}
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ ...generatorActions, ...actions }, dispatch)
+
 export default connect(
-  state => ({
-    fov: state.root.fov,
-    systems: (state.generator && state.generator.systems) || [],
-    generator: state.generator.settings
-  }),
-  dispatch => bindActionCreators({ ...generatorActions, ...actions }, dispatch)
+  makeMapStateToProps,
+  mapDispatchToProps
 )(Scene)

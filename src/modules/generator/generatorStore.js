@@ -7,6 +7,7 @@ export const CONSTANTS = {
   GALAXY: 'generator/GALAXY',
   SET_GENERATOR: 'scene/SET_GENERATOR'
 }
+const { STORE_NAME } = CONSTANTS
 
 const initialState = {
   settings: true
@@ -15,8 +16,11 @@ const initialState = {
         buildData: { gridOptions: [100, 30] }
       }
     : { classification: 'spiral' },
+  galaxy: {},
+
   systems: [],
-  galaxy: {}
+  systemCodes: [],
+  systemByCode: {}
 }
 
 export function reducer(state = initialState, action) {
@@ -27,23 +31,56 @@ export function reducer(state = initialState, action) {
     //   return { ...state, counter: state.counter + 1 };
     // }
     case CONSTANTS.SET_GENERATOR: {
-      console.log(action.payload)
+      console.log(CONSTANTS.SET_GENERATOR, action.payload)
       return {
         ...state,
         settings: action.payload
       }
     }
     case CONSTANTS.INIT: {
-      return { ...state, systems: [] }
+      console.log(CONSTANTS.INIT, action.payload)
+      return {
+        ...state,
+        galaxy: {},
+        systems: [],
+        systemCodes: [],
+        systemByCode: {}
+      }
     }
     case CONSTANTS.SYSTEM: {
-      return { ...state, systems: [...state.systems, action.payload] }
+      return {
+        ...state,
+        systems: [...state.systems, action.payload],
+        systemCodes: [...state.systemCodes, action.payload.code],
+        systemByCode: {
+          ...state.systemByCode,
+          [action.payload.code]: action.payload
+        }
+      }
     }
     case CONSTANTS.GALAXY: {
       return { ...state, galaxy: action.payload }
     }
     default:
       return state
+  }
+}
+
+export const selectors = {
+  getSettings(state) {
+    return state[STORE_NAME].settings
+  },
+  getGalaxy(state) {
+    return state[STORE_NAME].galaxy
+  },
+  DEPRECATED_getSystems(state) {
+    return state[STORE_NAME].systems
+  },
+  getSystemCodes(state) {
+    return state[STORE_NAME].systemCodes
+  },
+  getSystemByCode(state, code) {
+    return state[STORE_NAME].systemByCode[code]
   }
 }
 
@@ -109,6 +146,10 @@ export const middleware = store => next => async action => {
       if (isRunning) return
       isRunning = true
       await generate(store.dispatch, store.getState().generator.settings)
+      // @TODO make it working! it's can release loop :D
+      // await new Promise((resolve, reject) => setTimeout(resolve, 10)).then(() =>
+      //   generate(store.dispatch, store.getState().generator.settings)
+      // )
       isRunning = false
       return
     }

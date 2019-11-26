@@ -8,7 +8,11 @@ export const CONSTANTS = {
 const { STORE_NAME } = CONSTANTS
 
 const initialState = {
-  selected: null
+  selected: null,
+  settings: { fov: 70 },
+  eSettings: {
+    system_glow: { active: true }
+  }
 }
 
 export function reducer(state = initialState, action) {
@@ -26,9 +30,25 @@ export function reducer(state = initialState, action) {
 }
 
 export const selectors = {
+  getSettings(state) {
+    return state[STORE_NAME].settings
+  },
+  getElementSettings(state, name) {
+    return state[STORE_NAME].eSettings[name]
+  },
   getSelected(state) {
     // console.log('getSelected', state)
     return state[STORE_NAME].selected
+  },
+  isSelected(state, code) {
+    return selectors.getSelected(state) === code
+  },
+  isSystemSelected(state, code) {
+    const selected = selectors.getSelected(state)
+    return (
+      selected === code ||
+      (typeof selected === 'string' && selected.startsWith(code + '.'))
+    )
   }
 }
 

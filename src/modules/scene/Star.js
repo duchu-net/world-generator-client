@@ -1,33 +1,34 @@
 import * as THREE from 'three'
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, Suspense } from 'react'
 import { a } from 'react-spring/three'
-import starImg from './assets/sunmap.jpg'
-import moonImg from './assets/moon_surface.png'
 // import earthImg from '../images/earth.jpg'
 // import moonImg from '../images/moon.png'
 // import { useSelectedSystem } from "../store";
+import { useThree, useLoader } from 'react-three-fiber'
 import Text from './Text'
+import StarHight from './StarHight'
 
 import { getStore } from '../../store'
 import { selectors } from './sceneStore'
-import { useThree, useLoader } from 'react-three-fiber'
 
 const store = getStore()
 
-function Glow({}) {
-  return 'skadj'
+function changeColor(colorValue, hsL = 0.05) {
+  const color = new THREE.Color(colorValue)
+  const hsl = color.getHSL(color)
+  color.setHSL(hsl.h, hsl.s, Math.max(hsl.l - hsL, 0))
+  return color
 }
 
 export default function Star({
-  position,
-  color,
+  position = [0, 0, 0],
+  color = 'red',
   scale = 1,
   opacity = 1,
   ...props
 }) {
   const [selected, setSelected] = useState(false)
   useEffect(() => {
-    // console.log(props)
     const unsubscribe = store.subscribe(() => {
       setSelected(selectors.getSelected(store.getState()) === props.code)
     })
@@ -68,26 +69,12 @@ export default function Star({
   //   }
   // }, [selected])
 
-  // const counter = useSelector(state => state.counter);
   const ref = useRef()
   const [hovered, setHovered] = useState(false)
-  // const [selected, setSelected] = useState(false);
-
-  // const [nil, setSelectedSystem] = useSelectedSystem(null, true);
-  // const selected = selectedSystem.code === props.code;
   // if (selected) window.location.href = `#${props.code}`;
 
-  // console.log("<>", props);
-  // const [texture, moon] = useLoader(THREE.TextureLoader, [earthImg, moonImg])
-
-  // const [texture, moon] = useLoader(THREE.TextureLoader, [starImg, moonImg])
-
   return (
-    <group
-      ref={ref}
-      // scale={[100, 100, 100]}
-      position={position || [0, 0, 0]}
-    >
+    <group ref={ref} position={position}>
       {(hovered || selected) && (
         <Text
           frontToCamera
@@ -116,43 +103,30 @@ export default function Star({
         />
       )}
 
-      {/* {selected && texture && (
-        <mesh position={[0, 0, 0]}>
-          <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} />
-          <meshStandardMaterial
-            roughness={1}
-            attach="material"
-            color={color || '#FFFF99'}
-            map={texture}
-            fog={false}
-          />
-        </mesh>
-        // <mesh
-        //   scale={[scale, scale, scale]}
-        //   material={
-        //     new THREE.MeshPhongMaterial({
-        //       map: texture
-        //       // side: THREE.FrontSide
-        //     })
-        //   }
-        //   geometry={new THREE.SphereGeometry(1, 32, 32)}
-        // />
-      )} */}
-
-      {/* <mesh position={[5, -5, -5]}>
-        <sphereBufferGeometry attach="geometry" args={[0.75, 32, 32]} />
-        <meshStandardMaterial attach="material" roughness={1} map={moon} fog={false} />
+      {/* <mesh position={[0, 0, 0]}>
+        <sphereBufferGeometry attach="geometry" args={[1.1, 32, 32]} />
+        <meshStandardMaterial
+          attach="material"
+          roughness={1}
+          map={texture}
+          color={color}
+          fog={false}
+        />
       </mesh> */}
       {/* <pointLight position={[-5, -5, -5]} distance={1000} intensity={6} /> */}
+      {selected && (
+        <group scale={[scale, scale, scale]}>
+          {/* <Suspense fallback={null}>
+            <StarHight scale={[1.1, 1.1, 1.1]} color={color} />
+          </Suspense> */}
+        </group>
+      )}
       <a.mesh
         scale={[scale, scale, scale]}
         // scale={hovered ? [2, 2, 2] : [1, 1, 1]}
         position={[0, 0, 0]}
         onClick={e => {
           e.stopPropagation()
-          // console.log("click", props.code, selected);
-          // setSelected(!selected);
-          // setSelectedSystem({ code: props.code });
           store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
         }}
         onPointerOver={e => {
@@ -186,11 +160,16 @@ export default function Star({
         {/* <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} /> */}
         <meshBasicMaterial
           attach="material"
-          color={color || '#FFFF99'}
+          color={color ? changeColor(color) : '#FFFF99'}
           fog={false}
           opacity={opacity}
         />
-        {/* <pointLight distance={100} intensity={1} color="white" /> */}
+        <pointLight
+          distance={10}
+          intensity={10}
+          color={color || 'white'}
+          // decay={2}
+        />
       </a.mesh>
     </group>
   )

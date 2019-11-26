@@ -65,7 +65,7 @@ export default function Orbit({
     >
       <group>
         <lineLoop
-          rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
+          rotation={new THREE.Euler(-Math.PI / 2, 0, 0)}
           ref={pivotRef}
           position={new THREE.Vector3(0, 0, 0)}
           geometry={geometry}

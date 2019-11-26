@@ -11,7 +11,7 @@ export default function SystemGlow({
   const texture = useLoader(THREE.TextureLoader, asset)
   // return <primitive object={gltf.scene} />
   texture.color = color
-  console.log(texture, color)
+  // console.log(texture, color)
   return (
     <group position={position} scale={[10, 10, 10]}>
       <sprite

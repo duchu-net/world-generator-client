@@ -1,16 +1,18 @@
 import * as THREE from 'three'
 import React, { useRef, useState, useEffect, Suspense } from 'react'
+import { useThree, useLoader } from 'react-three-fiber'
 import { a } from 'react-spring/three'
+
 import starImg from './assets/sunmap.jpg'
 import moonImg from './assets/moon_surface.png'
 // import earthImg from '../images/earth.jpg'
 // import moonImg from '../images/moon.png'
 // import { useSelectedSystem } from "../store";
 import Text from './Text'
+import PlanetMedium from './PlanetMedium'
 
 import { getStore } from '../../store'
 import { selectors } from './sceneStore'
-import { useThree, useLoader } from 'react-three-fiber'
 
 // const store = getStore()
 
@@ -50,7 +52,7 @@ export default function Planet({
   return (
     <group
       ref={ref}
-      scale={[scale, scale, scale]}
+      // scale={[scale, scale, scale]}
       position={position || [0, 0, 0]}
     >
       <Text
@@ -63,31 +65,43 @@ export default function Planet({
         children={'xyz'}
         // visible={hovered || selected}
       />
-      <mesh
-        geometry={new THREE.SphereBufferGeometry(0.3, 16, 16)}
-        material={new THREE.MeshBasicMaterial({ color: color, fog: false })}
-        // meterial={
-        //   !texture
-        //     ? new THREE.MeshBasicMaterial({ color: '#FFFF99', fog: false })
-        //     : new THREE.MeshStandardMaterial({
-        //         roughness: 1,
-        //         // color:color || '#FFFF99',
-        //         map: texture,
-        //         fog: false
-        //       })
-        // }
-      >
-        {/* <Suspense
-          fallback={
-            <meshBasicMaterial
-              attach="material"
-              {...{ color: '#FFFF99', fog: false }}
-            />
-          }
+      {/* <Text
+        color="white"
+        size={0.5}
+        opacity={0.5}
+        position={[1, 0, 0]}
+        rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
+        children={'xyz'}
+      /> */}
+      <group scale={[scale, scale, scale]}>
+        <Suspense
+          // fallback={() => (
+          //   <mesh
+          //     geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
+          //     material={
+          //       new THREE.MeshBasicMaterial({ color: color, fog: false })
+          //     }
+          //   />
+          // )}
+          fallback={null}
         >
-          <PlanetAsset asset={moonImg} />
-        </Suspense> */}
-      </mesh>
+          <PlanetMedium />
+        </Suspense>
+        <mesh
+          geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
+          material={new THREE.MeshBasicMaterial({ color: color, fog: false })}
+          // meterial={
+          //   !texture
+          //     ? new THREE.MeshBasicMaterial({ color: '#FFFF99', fog: false })
+          //     : new THREE.MeshStandardMaterial({
+          //         roughness: 1,
+          //         // color:color || '#FFFF99',
+          //         map: texture,
+          //         fog: false
+          //       })
+          // }
+        />
+      </group>
     </group>
   )
 }

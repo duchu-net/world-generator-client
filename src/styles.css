@@ -60,13 +60,13 @@ a {
   /* min-height: 45px; */
   cursor: pointer;
   margin-top: 2%;
-  display: flex;
-  flex-direction: row;
+  /* display: flex;
+  flex-direction: row; */
 }
 .systems-list-item:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   /* color: #1e88e5; */
-  opacity: 0.7;
+  /* opacity: 0.7; */
 }
 .selected {
   /* background: black; */
@@ -80,20 +80,85 @@ a {
 .systems-list-item-body {
   padding: 5px;
   flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+}
+.systems-list-item-body > * {
+  flex: 1;
 }
 
 .stars-list {
   display: flex;
   flex-direction: row;
-  color: rgba(0, 0, 0, 0.6);
-  text-align: center;
-  font-weight: bold;
+  /* color: rgba(0, 0, 0, 0.6); */
+  color: black;
 }
 .stars-list .stars-list-item {
-  width: 60px;
-  height: 60px;
-  margin-left: 5px;
+  flex: 1 1 auto;
+  margin: 0 2px;
   background-repeat: no-repeat;
   background-position: center center;
-  /* background: url('./bg_star_blue.jpg'); */
+  display: flex;
+  /* font-weight: bold; */
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.info {
+  /* font-size: 80%; */
+}
+.generator .setters {
+  display: flex;
+
+  /* padding: 5px; */
+}
+.generator .setters > * {
+  flex: 1;
+  text-transform: uppercase;
+}
+.generator .controls {
+  padding: 5px;
+}
+
+.text-1 {
+  font-size: 120%;
+}
+.text-2 {
+  font-size: 100%;
+}
+.text-3 {
+  font-size: 90%;
+}
+.text-4 {
+  font-size: 80%;
+}
+.text-5 {
+  font-size: 70%;
+}
+.text-6 {
+  font-size: 60%;
+}
+
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
+.center {
+  text-align: center;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.container {
+  margin-top: 5px;
+  padding: 5px;
+}
+
+.habitable {
+  background-color: lightgreen;
 }
