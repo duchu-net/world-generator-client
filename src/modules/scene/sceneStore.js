@@ -2,16 +2,27 @@
 export const CONSTANTS = {
   STORE_NAME: 'scene',
   CONTROLS_ATTACHED: 'scene/CONTROLS_ATTACHED',
-  SELECT_SYSTEM: 'scene/SELECT_SYSTEM'
+  SELECT_SYSTEM: 'scene/SELECT_SYSTEM',
+  SELECT_SYSTEM_: 'scene/SELECT_SYSTEM_'
 }
 
 const { STORE_NAME } = CONSTANTS
 
 const initialState = {
+  counter: 0,
   selected: null,
-  settings: { fov: 70 },
-  eSettings: {
-    system_glow: { active: true }
+  // settings: { fov: 70 },
+  settings: {
+    // system_glow: { active: true },
+    scene: { fov: 70 },
+    galaxy: {},
+    system: {
+      'cage.show': true
+    },
+    star: {},
+    planet: {
+      'name.show': true
+    }
   }
 }
 
@@ -30,12 +41,12 @@ export function reducer(state = initialState, action) {
 }
 
 export const selectors = {
-  getSettings(state) {
-    return state[STORE_NAME].settings
+  getSettings(state, elementName = 'scene') {
+    return state[STORE_NAME].settings[elementName]
   },
-  getElementSettings(state, name) {
-    return state[STORE_NAME].eSettings[name]
-  },
+  // getElementSettings(state, name) {
+  //   return state[STORE_NAME].eSettings[name]
+  // },
   getSelected(state) {
     // console.log('getSelected', state)
     return state[STORE_NAME].selected
@@ -55,6 +66,12 @@ export const selectors = {
 export const actions = {
   select(payload) {
     return { type: CONSTANTS.SELECT_SYSTEM, payload }
+  },
+  selectSystem(code) {
+    return function(store) {
+      console.log(store)
+      return { type: CONSTANTS.SELECT_SYSTEM_, payload: { code } }
+    }
   },
   controlsAttached() {
     return { type: CONSTANTS.CONTROLS_ATTACHED }

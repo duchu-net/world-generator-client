@@ -147,7 +147,7 @@ export function System({ code }) {
           <Orbit radius={4} color={'#1e88e5'} idx={3}>
             <Planet color={'brown'} scale={0.3} />
           </Orbit>
-          <Orbit radius={6} color={'#1e88e5'} idx={2}>
+          {/* <Orbit radius={6} color={'#1e88e5'} idx={2}>
             <Planet color={'green'} scale={0.4} />
             <Orbit radius={1} color={'#1e88e5'} idx={4}>
               <Planet color={'slategray'} scale={0.16} />
@@ -158,9 +158,25 @@ export function System({ code }) {
           </Orbit>
           <Orbit radius={8} color={'#1e88e5'} idx={1}>
             <Planet color={'aqua'} scale={0.3} />
-          </Orbit>
+          </Orbit> */}
         </>
       )}
+
+      {/* <mesh
+        geometry={new THREE.IcosahedronGeometry(15, 1)}
+        material={
+          new THREE.MeshBasicMaterial({
+            color: new THREE.Color('gray'),
+            transparent: true,
+            wireframe: true,
+            opacity: 0.08
+          })
+        }
+        onClick={() => {
+          console.log('onClick')
+          store.dispatch(actions.selectSystem(code))
+        }}
+      /> */}
 
       <group>
         {stars.length === 1 && <Star {...stars[0]} key={stars[0].code} />}

@@ -19,8 +19,9 @@ import { generatorActions, generatorSelectors } from '../generator'
 // import useStore, { useSelectedSystem } from "../store";
 // import Star from './Star'
 import System from './System'
-import { actions } from './sceneStore'
-import { sceneSelectors } from '.'
+import { actions, selectors } from './sceneStore'
+// import GalaxyStarsPoints from './GalaxyStarsPoints'
+import Systems from './Systems'
 
 extend({ OrbitControls })
 
@@ -57,8 +58,6 @@ export function Scene({
   initGenerator,
   controlsAttached
 }) {
-  console.log('>', 'render scene', systemCodes.length)
-
   useEffect(() => {
     initGenerator()
     return () => {}
@@ -74,8 +73,10 @@ export function Scene({
       onCreated={({ gl, camera }) => {
         console.log('onCreated')
         // actions.init(camera);
-        gl.gammaInput = true
-        gl.toneMapping = THREE.Uncharted2ToneMapping
+        // gl.getShaderInfoLog = () => {}
+        // gl.getProgramInfoLog = () => {}
+        // gl.gammaInput = true
+        // gl.toneMapping = THREE.Uncharted2ToneMapping
         gl.setClearColor(new THREE.Color('#020207'))
       }}
     >
@@ -87,6 +88,8 @@ export function Scene({
           dampingFactor={0.1}
         />
         <ambientLight intensity={0.1} color="white" />
+        {/* <GalaxyStarsPoints /> */}
+        {/* <Systems /> */}
         <group ref={groupRef}>
           {/* <fog attach="fog" args={["black", 100, 700]} /> */}
           {/* <ambientLight intensity={0.25} /> */}
@@ -102,7 +105,7 @@ export function Scene({
 const makeMapStateToProps = (initialState, initialProps) => {
   const mapStateToProps = state => {
     return {
-      settings: sceneSelectors.getSettings(state),
+      settings: selectors.getSettings(state),
       systemCodes: generatorSelectors.getSystemCodes(state)
     }
   }

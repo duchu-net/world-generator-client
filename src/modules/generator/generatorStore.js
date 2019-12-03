@@ -2,14 +2,21 @@ import { Galaxy } from 'xenocide-world-generator'
 
 export const CONSTANTS = {
   STORE_NAME: 'generator',
+  GENERATOR_STATUS: {
+    READY: 'READY',
+    RUNNING: 'RUNNING',
+    COMPLETED: 'COMPLETED'
+  },
+  COMPLETED: 'generator/COMPLETED',
   INIT: 'generator/INIT',
   SYSTEM: 'generator/SYSTEM',
   GALAXY: 'generator/GALAXY',
   SET_GENERATOR: 'scene/SET_GENERATOR'
 }
-const { STORE_NAME } = CONSTANTS
+const { STORE_NAME, GENERATOR_STATUS } = CONSTANTS
 
 const initialState = {
+  status: CONSTANTS.READY,
   settings: true
     ? {
         classification: 'grid',
@@ -41,10 +48,18 @@ export function reducer(state = initialState, action) {
       console.log(CONSTANTS.INIT, action.payload)
       return {
         ...state,
+        status: GENERATOR_STATUS.RUNNING,
         galaxy: {},
         systems: [],
         systemCodes: [],
         systemByCode: {}
+      }
+    }
+    case CONSTANTS.COMPLETED: {
+      console.log(CONSTANTS.COMPLETED, action.payload)
+      return {
+        ...state,
+        status: GENERATOR_STATUS.COMPLETED
       }
     }
     case CONSTANTS.SYSTEM: {
@@ -67,6 +82,9 @@ export function reducer(state = initialState, action) {
 }
 
 export const selectors = {
+  getStatus(state) {
+    return state[STORE_NAME].status
+  },
   getSettings(state) {
     return state[STORE_NAME].settings
   },
@@ -150,6 +168,7 @@ export const middleware = store => next => async action => {
       // await new Promise((resolve, reject) => setTimeout(resolve, 10)).then(() =>
       //   generate(store.dispatch, store.getState().generator.settings)
       // )
+      store.dispatch(actions.completeGenerator())
       isRunning = false
       return
     }
@@ -164,6 +183,9 @@ export const actions = {
   },
   initGenerator() {
     return { type: CONSTANTS.INIT }
+  },
+  completeGenerator(payload) {
+    return { type: CONSTANTS.COMPLETED, payload }
   },
   updateGalaxy(payload) {
     return { type: CONSTANTS.GALAXY, payload }

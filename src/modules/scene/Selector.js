@@ -1,14 +1,14 @@
-import * as THREE from "three";
-import React, { useRef, useState } from "react";
-import { useLoader } from "react-three-fiber";
-import { a } from "react-spring/three";
+import * as THREE from 'three'
+import React, { useRef, useState } from 'react'
+import { useLoader } from 'react-three-fiber'
+import { a } from 'react-spring/three'
 // import earthImg from '../images/earth.jpg'
 // import moonImg from '../images/moon.png'
-import THREElegacy from "./LegacyJSONLoader";
-THREElegacy(THREE);
+import THREElegacy from './LegacyJSONLoader'
+THREElegacy(THREE)
 
-export default function Selector({ position, color, ...props }) {
-  const ref = useRef();
+export default function Selector({ position = [0, 0, 0], color, ...props }) {
+  const ref = useRef()
   // const [hovered, setHovered] = useState(false);
   // console.log("<>", props);
   // const [texture, moon] = useLoader(THREE.TextureLoader, [earthImg, moonImg])
@@ -16,7 +16,7 @@ export default function Selector({ position, color, ...props }) {
     <group
       ref={ref}
       // scale={[100, 100, 100]}
-      position={position || [-500, -500, 1000]}
+      position={position}
     >
       {/* <mesh>
         <sphereBufferGeometry attach="geometry" args={[5, 32, 32]} />
@@ -51,18 +51,18 @@ export default function Selector({ position, color, ...props }) {
         // onUpdate={self => console.log("props have been updated")}
       >
         {/* <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} /> */}
-        <meshBasicMaterial color={color || "#FFFF99"} />
+        <meshBasicMaterial color={color || '#FFFF99'} />
         {/* <pointLight distance={6100} intensity={50} color="white" /> */}
       </a.mesh>
     </group>
-  );
+  )
 }
 
 const object = new THREE.LegacyJSONLoader().parse({
   metadata: {
     formatVersion: 3.1,
-    sourceFile: "selected_system.obj",
-    generatedBy: "OBJConverter",
+    sourceFile: 'selected_system.obj',
+    generatedBy: 'OBJConverter',
     vertices: 248,
     faces: 248,
     normals: 960,
@@ -6121,4 +6121,4 @@ const object = new THREE.LegacyJSONLoader().parse({
     958,
     959
   ]
-});
+})

@@ -11,6 +11,8 @@ export default function PlanetMedium({
 }) {
   const [texture] = useLoader(THREE.TextureLoader, [moonImg])
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+
+  // console.log(texture)
   // const texture = useLoader(THREE.TextureLoader, asset)
   // return <primitive object={gltf.scene} />
   // texture.color = color
@@ -22,7 +24,7 @@ export default function PlanetMedium({
         geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
         material={
           new THREE.MeshStandardMaterial({
-            roughness: 1,
+            // roughness: 1,
             map: texture,
             color: color
             // blending: THREE.AdditiveBlending,

@@ -149,28 +149,27 @@ export default function Star({
         geometry={
           new THREE.SphereBufferGeometry(
             selected ? 1 : 1,
-            selected ? 32 : 16,
-            selected ? 32 : 16
+            selected ? 32 : 8,
+            selected ? 32 : 8
           )
         }
         // geometry={
         //   new THREE.SphereGeometry(1, selected ? 16 : 8, selected ? 16 : 8)
         // }
       >
-        {/* <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} /> */}
         <meshBasicMaterial
           attach="material"
           color={color ? changeColor(color) : '#FFFF99'}
           fog={false}
           opacity={opacity}
         />
-        <pointLight
-          distance={10}
-          intensity={10}
-          color={color || 'white'}
-          // decay={2}
-        />
       </a.mesh>
+      <pointLight
+        distance={10}
+        intensity={10}
+        color={color || 'white'}
+        // decay={2}
+      />
     </group>
   )
 }

@@ -14,7 +14,7 @@ import PlanetMedium from './PlanetMedium'
 import { getStore } from '../../store'
 import { selectors } from './sceneStore'
 
-// const store = getStore()
+const store = getStore()
 
 function PlanetAsset({ asset }) {
   const texture = useLoader(THREE.TextureLoader, asset)
@@ -33,19 +33,21 @@ export default function Planet({
   scale = 1,
   ...props
 }) {
-  // const [selected, setSelected] = useState(false)
-  // useEffect(() => {
-  //   console.log(props)
-  //   const unsubscribe = store.subscribe(() => {
-  //     setSelected(selectors.getSelected(store.getState()) === props.code)
-  //   })
-  //   return () => {
-  //     unsubscribe()
-  //   }
-  // }, [])
+  const [settings, setSettings] = useState(
+    selectors.getSettings(store.getState(), 'planet')
+  )
+  useEffect(() => {
+    // console.log(props)
+    const unsubscribe = store.subscribe(() => {
+      setSettings(selectors.getSettings(store.getState(), 'planet'))
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
 
   // const [texture] = useLoader(THREE.TextureLoader, [moonImg])
-  // console.log(texture)
+  console.log(settings)
 
   const ref = useRef()
 
@@ -53,18 +55,20 @@ export default function Planet({
     <group
       ref={ref}
       // scale={[scale, scale, scale]}
-      position={position || [0, 0, 0]}
+      position={position}
     >
-      <Text
-        frontToCamera
-        color="white"
-        size={0.3}
-        opacity={0.5}
-        position={[0, 1.5, 0]}
-        // rotation={[-Math.PI / 2, 0, 0]}
-        children={'xyz'}
-        // visible={hovered || selected}
-      />
+      {settings['name.show'] && (
+        <Text
+          frontToCamera
+          color="white"
+          size={0.3}
+          opacity={0.5}
+          position={[0, 1.5, 0]}
+          // rotation={[-Math.PI / 2, 0, 0]}
+          children={'xyz'}
+          // visible={hovered || selected}
+        />
+      )}
       {/* <Text
         color="white"
         size={0.5}
@@ -74,7 +78,7 @@ export default function Planet({
         children={'xyz'}
       /> */}
       <group scale={[scale, scale, scale]}>
-        <Suspense
+        {/* <Suspense
           // fallback={() => (
           //   <mesh
           //     geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
@@ -86,7 +90,7 @@ export default function Planet({
           fallback={null}
         >
           <PlanetMedium />
-        </Suspense>
+        </Suspense> */}
         <mesh
           geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
           material={new THREE.MeshBasicMaterial({ color: color, fog: false })}

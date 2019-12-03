@@ -54,7 +54,8 @@ export default function Orbit({
   useFrame(
     //   ({ camera }) => frontToCamera && groupRef.current.lookAt(camera.position)
     () =>
-      (pivotRef.current.rotation.z = pivotRef.current.rotation.z += 0.002 * idx)
+      (pivotRef.current.rotation.z = pivotRef.current.rotation.z +=
+        0.0005 * idx)
   )
 
   return (
