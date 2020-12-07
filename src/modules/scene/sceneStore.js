@@ -18,6 +18,7 @@ const initialState = {
     galaxy: {},
     system: {
       'cage.show': true
+      // 'cage.show': false
     },
     star: {},
     planet: {
@@ -68,7 +69,7 @@ export const actions = {
     return { type: CONSTANTS.SELECT_SYSTEM, payload }
   },
   selectSystem(code) {
-    return function(store) {
+    return function (store) {
       console.log(store)
       return { type: CONSTANTS.SELECT_SYSTEM_, payload: { code } }
     }

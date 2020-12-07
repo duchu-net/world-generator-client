@@ -7,7 +7,6 @@ import * as THREE from 'three'
 import { OrbitControls } from './assets/OrbitControls'
 import {
   extend,
-  useRender,
   useThree,
   useFrame,
   Canvas
@@ -22,13 +21,14 @@ import System from './System'
 import { actions, selectors } from './sceneStore'
 // import GalaxyStarsPoints from './GalaxyStarsPoints'
 import Systems from './Systems'
+import SquareGrid from './SquareGrid'
 
 extend({ OrbitControls })
 
 export const Controls = ({ onAttach = () => {}, ...props }) => {
   const { gl, camera } = useThree()
   const controls = useRef()
-  useRender((state, delta) => {
+  useFrame((state, delta) => {
     if (controls.current) {
       controls.current.update()
       controls.current.updateTween()
@@ -90,6 +90,10 @@ export function Scene({
         <ambientLight intensity={0.1} color="white" />
         {/* <GalaxyStarsPoints /> */}
         {/* <Systems /> */}
+
+        {/* <SquareGrid />
+        <axisHelper /> */}
+
         <group ref={groupRef}>
           {/* <fog attach="fog" args={["black", 100, 700]} /> */}
           {/* <ambientLight intensity={0.25} /> */}
@@ -103,7 +107,7 @@ export function Scene({
 }
 
 const makeMapStateToProps = (initialState, initialProps) => {
-  const mapStateToProps = state => {
+  const mapStateToProps = (state) => {
     return {
       settings: selectors.getSettings(state),
       systemCodes: generatorSelectors.getSystemCodes(state)
@@ -111,10 +115,7 @@ const makeMapStateToProps = (initialState, initialProps) => {
   }
   return mapStateToProps
 }
-const mapDispatchToProps = dispatch =>
+const mapDispatchToProps = (dispatch) =>
   bindActionCreators({ ...generatorActions, ...actions }, dispatch)
 
-export default connect(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(Scene)
+export default connect(makeMapStateToProps, mapDispatchToProps)(Scene)

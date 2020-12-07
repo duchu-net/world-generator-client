@@ -16,33 +16,50 @@ export default function StarHight({
   // return <primitive object={gltf.scene} />
   // texture.color = color
   // console.log(texture, color)
+
+  const material = new THREE.MeshPhongMaterial({
+    color,
+    map: texture,
+    //  displacementMap: displacementMap,
+    displacementScale: 0.06,
+    // bumpMap: displacementMap,
+    bumpScale: 0.04,
+    reflectivity: 0,
+    shininess: 0
+  })
+
   return (
     <group position={position} scale={scale}>
       <mesh
         // position={[0, 0, 0]}
         material={
           new THREE.ShaderMaterial({
-            color: color,
-            uniforms: {},
+            // color: color,
+            uniforms: {
+              // diffuse: { type: 'c', value: { r: 1, g: 0, b: 0 } }
+              colorA: { type: 'vec3', value: new THREE.Color(color) }
+            },
             vertexShader: `
             varying vec3 vNormal;
-            void main() 
-            {
-                vNormal = normalize( normalMatrix * normal );
-                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             }`,
-            fragmentShader: ` 
+            fragmentShader: `
             varying vec3 vNormal;
-            void main() 
-            {
-              float intensity = pow( 0.7 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), 4.0 ); 
-                gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;
+            uniform vec3 colorA;
+            void main() {
+              // float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 4.0);
+              float intensity = pow(0.2 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 4.0);
+              // gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * intensity;
+              gl_FragColor = vec4(colorA, 1) * intensity;
             }`,
             side: THREE.BackSide,
-            blending: THREE.AdditiveBlending,
+            // blending: THREE.AdditiveBlending,
             transparent: true
           })
         }
+        // material={material}
       >
         <sphereBufferGeometry attach="geometry" args={[1, 32, 32]} />
         {/* <meshStandardMaterial

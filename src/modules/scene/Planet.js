@@ -31,6 +31,7 @@ export default function Planet({
   position,
   color = '#595959',
   scale = 1,
+  name = 'xyz',
   ...props
 }) {
   const [settings, setSettings] = useState(
@@ -47,7 +48,7 @@ export default function Planet({
   }, [])
 
   // const [texture] = useLoader(THREE.TextureLoader, [moonImg])
-  console.log(settings)
+  // console.log(settings)
 
   const ref = useRef()
 
@@ -65,7 +66,7 @@ export default function Planet({
           opacity={0.5}
           position={[0, 1.5, 0]}
           // rotation={[-Math.PI / 2, 0, 0]}
-          children={'xyz'}
+          children={name}
           // visible={hovered || selected}
         />
       )}

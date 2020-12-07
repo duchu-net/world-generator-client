@@ -7,6 +7,7 @@ import { a } from 'react-spring/three'
 import { useThree, useLoader } from 'react-three-fiber'
 import Text from './Text'
 import StarHight from './StarHight'
+import StarSprite from './StarSprite'
 
 import { getStore } from '../../store'
 import { selectors } from './sceneStore'
@@ -25,6 +26,8 @@ export default function Star({
   color = 'red',
   scale = 1,
   opacity = 1,
+  quality = 'high',
+  selectedSystem = false,
   ...props
 }) {
   const [selected, setSelected] = useState(false)
@@ -73,8 +76,25 @@ export default function Star({
   const [hovered, setHovered] = useState(false)
   // if (selected) window.location.href = `#${props.code}`;
 
+  const starColor = color ? changeColor(color, 0) : '#FFFF99'
+
   return (
-    <group ref={ref} position={position}>
+    <group
+      ref={ref}
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation()
+        store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation()
+        setHovered(true)
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation()
+        setHovered(false)
+      }}
+    >
       {(hovered || selected) && (
         <Text
           frontToCamera
@@ -82,7 +102,7 @@ export default function Star({
           size={0.5}
           position={[0, 1.5, 0]}
           // rotation={[-Math.PI / 2, 0, 0]}
-          children={props.code.split('.').slice(-1)[0]}
+          children={props.designation}
           // visible={hovered || selected}
         />
       )}
@@ -90,7 +110,7 @@ export default function Star({
       {hovered && (
         <a.mesh
           position={[0, 0, 0]}
-          geometry={new THREE.IcosahedronGeometry(4, 1)}
+          geometry={new THREE.IcosahedronGeometry(1.5, 1)}
           material={
             new THREE.MeshBasicMaterial({
               color: new THREE.Color('#1e88e5'),
@@ -114,62 +134,61 @@ export default function Star({
         />
       </mesh> */}
       {/* <pointLight position={[-5, -5, -5]} distance={1000} intensity={6} /> */}
-      {selected && (
-        <group scale={[scale, scale, scale]}>
-          {/* <Suspense fallback={null}>
-            <StarHight scale={[1.1, 1.1, 1.1]} color={color} />
-          </Suspense> */}
-        </group>
-      )}
-      <a.mesh
-        scale={[scale, scale, scale]}
-        // scale={hovered ? [2, 2, 2] : [1, 1, 1]}
-        position={[0, 0, 0]}
-        onClick={e => {
-          e.stopPropagation()
-          store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
-        }}
-        onPointerOver={e => {
-          e.stopPropagation()
-          setHovered(true)
-        }}
-        onPointerOut={e => {
-          e.stopPropagation()
-          setHovered(false)
-        }}
-        // onWheel={e => console.log("wheel spins")}
-        // onPointerUp={e => console.log("up")}
-        // onPointerDown={e => console.log("down")}
-        // onPointerEnter={e => console.log("enter")}
-        // onPointerLeave={e => console.log("leave")}
-        // onPointerMove={e => console.log("move")}
-        // onUpdate={self => console.log("props have been updated")}
+      {selectedSystem && quality === 'low' && (
+        <a.mesh
+          scale={[scale, scale, scale]}
+          // scale={hovered ? [2, 2, 2] : [1, 1, 1]}
+          position={[0, 0, 0]}
+          // onClick={(e) => {
+          //   e.stopPropagation()
+          //   store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
+          // }}
+          // onPointerOver={(e) => {
+          //   e.stopPropagation()
+          //   setHovered(true)
+          // }}
+          // onPointerOut={(e) => {
+          //   e.stopPropagation()
+          //   setHovered(false)
+          // }}
+          // onWheel={e => console.log("wheel spins")}
+          // onPointerUp={e => console.log("up")}
+          // onPointerDown={e => console.log("down")}
+          // onPointerEnter={e => console.log("enter")}
+          // onPointerLeave={e => console.log("leave")}
+          // onPointerMove={e => console.log("move")}
+          // onUpdate={self => console.log("props have been updated")}
 
-        // geometry={new THREE.IcosahedronGeometry(1, 1)}
-        geometry={
-          new THREE.SphereBufferGeometry(
-            selected ? 1 : 1,
-            selected ? 32 : 8,
-            selected ? 32 : 8
-          )
-        }
-        // geometry={
-        //   new THREE.SphereGeometry(1, selected ? 16 : 8, selected ? 16 : 8)
-        // }
-      >
-        <meshBasicMaterial
-          attach="material"
-          color={color ? changeColor(color) : '#FFFF99'}
-          fog={false}
-          opacity={opacity}
+          // geometry={new THREE.IcosahedronGeometry(1, 1)}
+          geometry={
+            new THREE.SphereBufferGeometry(
+              ...(selectedSystem ? [1, 32, 32] : [1, 6, 6])
+            )
+          }
+          // geometry={
+          //   new THREE.SphereGeometry(1, selected ? 16 : 8, selected ? 16 : 8)
+          // }
+        >
+          <meshBasicMaterial
+            attach="material"
+            color={starColor}
+            fog={false}
+            opacity={opacity}
+          />
+        </a.mesh>
+      )}
+      {selectedSystem && quality === 'high' && (
+        <StarHight scale={[scale, scale, scale]} color={starColor} />
+      )}
+      {!selectedSystem && <StarSprite color={starColor} />}
+      {selectedSystem && (
+        <pointLight
+          distance={10}
+          intensity={10}
+          color={color || 'white'}
+          // decay={2}
         />
-      </a.mesh>
-      <pointLight
-        distance={10}
-        intensity={10}
-        color={color || 'white'}
-        // decay={2}
-      />
+      )}
     </group>
   )
 }
