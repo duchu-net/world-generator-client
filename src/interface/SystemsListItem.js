@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { generatorSelectors } from '../modules/generator'
 import { sceneSelectors } from '../modules/scene'
 import { Text } from './typo'
+import starImg from './bg_star_blue.jpg'
 
 const STAR_TYPES_BY_STARS_COUNT = {
   '1': 'single star',
@@ -22,16 +23,26 @@ const STAR_TYPE_BY_SUBTYPE = {
 }
 
 function SystemsListItem({ system = {}, selected, select }) {
+  const listItemRef = useRef()
+
+  useEffect(() => {
+    if (selected) listItemRef.current.scrollIntoViewIfNeeded()
+  }, [selected])
+
   const isSelected = selected
-  const isHabitable = system.stars.every(star => star.habitable)
+  const isHabitable = system.stars.every((star) => star.habitable)
 
   const star = system.stars[0]
   // console.log(system)
   return (
     <div
       // key={system.name}
-      onClick={() => select(star.code)}
+      ref={listItemRef}
+      onClick={() => {
+        select(star.code)
+      }}
       className={'systems-list-item ' + (isSelected ? 'selected' : '')}
+      style={{ backgroundImage: isSelected ? `url(${starImg})` : 'none' }}
     >
       <div className={'systems-list-item-body'}>
         <div>
@@ -50,13 +61,13 @@ function SystemsListItem({ system = {}, selected, select }) {
       </div>
       {/* <div className={'center'}>stars</div> */}
       <div className={'stars-list'}>
-        {system.stars.map(star => (
+        {system.stars.map((star) => (
           <div
             key={star.code}
             className={'stars-list-item'}
             style={{
               background: star.color
-              // backgroundImage: `url(${starImg})`
+              // backgroundImage: isSelected ? `url(${starImg})` : 'none'
             }}
           >
             <div className={'text-2 bold'} style={{ background: star.color }}>
@@ -76,7 +87,7 @@ function SystemsListItem({ system = {}, selected, select }) {
 }
 
 const makeMapStateToProps = (initialState, { code }) => {
-  const mapStateToProps = state => {
+  const mapStateToProps = (state) => {
     return {
       selected: sceneSelectors.isSystemSelected(state, code),
       system: generatorSelectors.getSystemByCode(state, code)
@@ -85,4 +96,4 @@ const makeMapStateToProps = (initialState, { code }) => {
   return mapStateToProps
 }
 
-export default connect(makeMapStateToProps)(SystemsListItem)
+export default connect(makeMapStateToProps)(memo(SystemsListItem))

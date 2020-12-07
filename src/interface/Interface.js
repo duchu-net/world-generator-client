@@ -1,10 +1,9 @@
-import React, { useRef, useEffect, forwardRef, useState } from 'react'
+import React, { memo, useRef, useEffect, forwardRef, useState } from 'react'
 // import { useSelectedSystem } from "../store";
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { generatorActions, generatorSelectors } from '../modules/generator'
 import { sceneSelectors, sceneActions } from '../modules/scene'
-import starImg from './bg_star_blue.jpg'
 import SystemsListItem from './SystemsListItem'
 import { Text } from './typo'
 
@@ -122,4 +121,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   makeMapStateToProps,
   mapDispatchToProps
-)(Interface)
+)(memo(Interface))
