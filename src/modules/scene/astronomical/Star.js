@@ -1,16 +1,13 @@
 import * as THREE from 'three'
 import React, { useRef, useState, useEffect, Suspense } from 'react'
-import { a } from 'react-spring/three'
-// import earthImg from '../images/earth.jpg'
-// import moonImg from '../images/moon.png'
-// import { useSelectedSystem } from "../store";
 import { useThree, useLoader } from 'react-three-fiber'
-import Text from './Text'
+import { a } from 'react-spring/three'
+import Text from '../utils/Text'
 import StarHight from './StarHight'
 import StarSprite from './StarSprite'
 
-import { getStore } from '../../store'
-import { selectors } from './sceneStore'
+import { getStore } from '../../../store'
+import { selectors } from '../sceneStore'
 
 const store = getStore()
 
@@ -78,6 +75,10 @@ export default function Star({
 
   const starColor = color ? changeColor(color, 0) : '#FFFF99'
 
+  const renderLight = selectedSystem
+  const renderText = hovered || selected
+  const renderCage = hovered
+
   return (
     <group
       ref={ref}
@@ -95,34 +96,6 @@ export default function Star({
         setHovered(false)
       }}
     >
-      {(hovered || selected) && (
-        <Text
-          frontToCamera
-          color="white"
-          size={0.5}
-          position={[0, 1.5, 0]}
-          // rotation={[-Math.PI / 2, 0, 0]}
-          children={props.designation}
-          // visible={hovered || selected}
-        />
-      )}
-      {/* {(hovered || selected) && ( */}
-      {hovered && (
-        <a.mesh
-          position={[0, 0, 0]}
-          geometry={new THREE.IcosahedronGeometry(1.5, 1)}
-          material={
-            new THREE.MeshBasicMaterial({
-              color: new THREE.Color('#1e88e5'),
-              transparent: true,
-              wireframe: true,
-              opacity: hovered ? 0.1 : 0.2
-            })
-          }
-          // visible={hovered || selected}
-        />
-      )}
-
       {/* <mesh position={[0, 0, 0]}>
         <sphereBufferGeometry attach="geometry" args={[1.1, 32, 32]} />
         <meshStandardMaterial
@@ -138,7 +111,7 @@ export default function Star({
         <a.mesh
           scale={[scale, scale, scale]}
           // scale={hovered ? [2, 2, 2] : [1, 1, 1]}
-          position={[0, 0, 0]}
+          // position={[0, 0, 0]}
           // onClick={(e) => {
           //   e.stopPropagation()
           //   store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
@@ -181,12 +154,39 @@ export default function Star({
         <StarHight scale={[scale, scale, scale]} color={starColor} />
       )}
       {!selectedSystem && <StarSprite color={starColor} />}
-      {selectedSystem && (
+      {renderLight && (
         <pointLight
-          distance={10}
-          intensity={10}
+          distance={25}
+          intensity={2}
           color={color || 'white'}
           // decay={2}
+        />
+      )}
+      {renderText && (
+        <Text
+          frontToCamera
+          color="white"
+          size={0.5}
+          position={[0, 1.5, 0]}
+          // rotation={[-Math.PI / 2, 0, 0]}
+          children={props.designation}
+          // visible={hovered || selected}
+        />
+      )}
+      {/* {(hovered || selected) && ( */}
+      {renderCage && (
+        <a.mesh
+          // position={[0, 0, 0]}
+          geometry={new THREE.IcosahedronGeometry(1.5, 1)}
+          material={
+            new THREE.MeshBasicMaterial({
+              color: new THREE.Color('#1e88e5'),
+              transparent: true,
+              wireframe: true,
+              opacity: hovered ? 0.1 : 0.2
+            })
+          }
+          // visible={hovered || selected}
         />
       )}
     </group>

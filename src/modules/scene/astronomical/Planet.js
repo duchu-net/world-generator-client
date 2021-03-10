@@ -1,56 +1,57 @@
 import * as THREE from 'three'
-import React, { useRef, useState, useEffect, Suspense } from 'react'
-import { useThree, useLoader } from 'react-three-fiber'
+import React, { memo, useRef, useState, useEffect, Suspense } from 'react'
+import { useThree } from 'react-three-fiber'
 import { a } from 'react-spring/three'
 
-import starImg from './assets/sunmap.jpg'
-import moonImg from './assets/moon_surface.png'
-// import earthImg from '../images/earth.jpg'
-// import moonImg from '../images/moon.png'
-// import { useSelectedSystem } from "../store";
-import Text from './Text'
+import { getStore } from '../../../store'
+import { selectors } from '../sceneStore'
+import Text from '../utils/Text'
 import PlanetMedium from './PlanetMedium'
-
-import { getStore } from '../../store'
-import { selectors } from './sceneStore'
 
 const store = getStore()
 
-function PlanetAsset({ asset }) {
-  const texture = useLoader(THREE.TextureLoader, asset)
-  const props = {
-    roughness: 1,
-    // color:color || '#FFFF99',
-    map: texture,
-    fog: false
-  }
-  return <material attach={'material'} {...props} />
-}
+// function PlanetAsset({ asset }) {
+//   const texture = useLoader(THREE.TextureLoader, asset)
+//   const props = {
+//     roughness: 1,
+//     // color:color || '#FFFF99',
+//     map: texture,
+//     fog: false
+//   }
+//   return <material attach={'material'} {...props} />
+// }
 
-export default function Planet({
+function Planet({
   position,
   color = '#595959',
   scale = 1,
   name = 'xyz',
+  type,
+  systemCode,
+  planetCode,
   ...props
 }) {
   const [settings, setSettings] = useState(
     selectors.getSettings(store.getState(), 'planet')
   )
+  const [selected, setSelected] = useState(false)
+  const { camera } = useThree()
+
   useEffect(() => {
-    // console.log(props)
     const unsubscribe = store.subscribe(() => {
       setSettings(selectors.getSettings(store.getState(), 'planet'))
+      // @TODO
+      setSelected(selectors.isPlanetSelected(store.getState(), planetCode))
     })
     return () => {
       unsubscribe()
     }
   }, [])
 
-  // const [texture] = useLoader(THREE.TextureLoader, [moonImg])
-  // console.log(settings)
-
   const ref = useRef()
+  useEffect(() => {
+    if (selected) camera.updateTarget(ref.current)
+  }, [selected, camera])
 
   return (
     <group
@@ -78,8 +79,18 @@ export default function Planet({
         rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
         children={'xyz'}
       /> */}
-      <group scale={[scale, scale, scale]}>
-        {/* <Suspense
+      <group
+        onClick={(e) => {
+          e.stopPropagation()
+          console.log('select planet')
+          store.dispatch({
+            type: 'scene/SELECT_PLANET',
+            payload: `${systemCode}/${planetCode}`
+          })
+        }}
+        scale={[scale, scale, scale]}
+      >
+        <Suspense
           // fallback={() => (
           //   <mesh
           //     geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
@@ -90,10 +101,10 @@ export default function Planet({
           // )}
           fallback={null}
         >
-          <PlanetMedium />
-        </Suspense> */}
+          <PlanetMedium type={type} />
+        </Suspense>
         <mesh
-          geometry={new THREE.SphereBufferGeometry(1, 16, 16)}
+          geometry={new THREE.SphereBufferGeometry(0.95, 16, 16)}
           material={new THREE.MeshBasicMaterial({ color: color, fog: false })}
           // meterial={
           //   !texture
@@ -107,6 +118,25 @@ export default function Planet({
           // }
         />
       </group>
+
+      {/* @TODO */}
+      {selected && (
+        <a.mesh
+          geometry={new THREE.IcosahedronGeometry(1.3, 1)}
+          material={
+            new THREE.MeshBasicMaterial({
+              color: new THREE.Color('#1e88e5'),
+              transparent: true,
+              wireframe: true,
+              opacity: 0.3
+              // opacity: hovered ? 0.1 : 0.2
+            })
+          }
+          // visible={hovered || selected}
+        />
+      )}
     </group>
   )
 }
+
+export default memo(Planet)

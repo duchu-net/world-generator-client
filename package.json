@@ -9,6 +9,7 @@
     "@babel/plugin-proposal-optional-chaining": "7.7.4",
     "prop-types": "15.7.2",
     "react": "17.0.1",
+    "react-app-rewired": "2.1.8",
     "react-dom": "17.0.1",
     "react-redux": "7.1.3",
     "react-scripts": "4.0.1",
@@ -17,6 +18,9 @@
     "redux": "4.0.4",
     "three": "^0.109.0",
     "tween": "0.9.0",
+    "webpack": "5.24.3",
+    "worker-loader": "3.0.8",
+    "worker-plugin": "5.0.0",
     "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator",
     "zustand": "2.2.1"
   },
@@ -24,15 +28,10 @@
     "typescript": "3.3.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
 }

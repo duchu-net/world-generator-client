@@ -87,11 +87,21 @@ a {
   flex: 1;
 }
 
+.planets-list,
 .stars-list {
   display: flex;
   flex-direction: row;
   /* color: rgba(0, 0, 0, 0.6); */
   color: black;
+}
+.planets-list {
+  flex-wrap: wrap;
+}
+.planets-list-item {
+  width: 32%;
+  margin: 2px;
+  text-align: center;
+  font-size: 12px;
 }
 .stars-list .stars-list-item {
   flex: 1 1 auto;

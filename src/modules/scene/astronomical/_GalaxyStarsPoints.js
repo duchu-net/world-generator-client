@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { getStore } from '../../store'
-import { generatorSelectors } from '../generator'
+import { generatorSelectors } from '../../generator'
 
 const store = getStore()
 
@@ -22,7 +22,7 @@ export default function GalaxyStarsPoints({}) {
   }, [])
 
   const positions = Object.values(systems)
-    .map(system => [system.position.x, system.position.y, system.position.z])
+    .map((system) => [system.position.x, system.position.y, system.position.z])
     .reduce((prev, curr) => {
       prev.push(curr[0])
       prev.push(curr[1])

@@ -1,29 +1,25 @@
 import React, { Suspense } from 'react'
 import { useLoader } from 'react-three-fiber'
 import * as THREE from 'three'
-import glowImg from './assets/glow.png'
+import glowImg from '../assets/circle.png'
 
-export default function SystemGlow({
+export default function StarSprite({
   asset = glowImg,
   color = '#ffffff',
   position = [0, 0, 0],
-  scale = 8
+  scale = 1
 }) {
   const texture = useLoader(THREE.TextureLoader, asset)
-  // return <primitive object={gltf.scene} />
-  // texture.color = color
-  // console.log(texture, color)
+
   return (
     <sprite
       position={position}
       scale={[scale, scale, scale]}
       material={
         new THREE.SpriteMaterial({
-          color,
           map: texture,
-          blending: THREE.AdditiveBlending,
-          opacity: 0.5,
-          transparent: true
+          color: color,
+          blending: THREE.NormalBlending
         })
       }
       sortParticles

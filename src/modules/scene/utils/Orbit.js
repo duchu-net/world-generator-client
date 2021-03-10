@@ -1,21 +1,33 @@
 import * as THREE from 'three'
-import React, { useState, useMemo, useRef } from 'react'
+import React, { memo, useState, useMemo, useRef, useEffect } from 'react'
 import { useThree, useFrame } from 'react-three-fiber'
-import fontFile from './assets/sans'
 
-export default function Orbit({
+const dt = new Date()
+// const startTime =
+//   dt.getSeconds() + 60 * dt.getMinutes() + 60 * 60 * dt.getHours()
+//     const { revolution_time } = this.props.planet
+//     const from_star = this.props.planet.from_star || this.props.from_star
+//     const orbit_period = (this.props.planet || {}).orbit_period || 360 * from_star
+//     const yStart = ((dt.getSeconds() + (60 * dt.getMinutes()) + (60 * 60 * dt.getHours())) /60/60/24) * orbit_period * (Math.PI/180)
+//     this.$orbitRotation.rotation.y = yStart
+//     this.$orbitProjectionRotation.rotation.y = yStart
+
+function Orbit({
   idx = 1,
   opacity = 0.3,
   radius = 1,
   color = '#000000',
   linewidth = 5,
+  orbitalPeriod = 1,
   // size = 1,  color = '#000000',
   // centerX = true,
   // centerY = true,
   children,
   ...props
 }) {
+  // const [dt] = useState(new Date())
   const groupRef = useRef()
+  const pivotRef = useRef()
   // const [font] = useState(() => new THREE.FontLoader().parse(fontFile))
   const [geometry] = useMemo(() => {
     // let x = 0,
@@ -49,15 +61,31 @@ export default function Orbit({
     ]
   }, [radius])
 
-  const pivotRef = useRef()
+  // useEffect(() => {
+  //   console.log('useEffect')
+  //   const zStart = (startTime / 60 / 60 / 24) * orbitalPeriod * (Math.PI / 180)
+
+  //   pivotRef.current.rotation.z = zStart
+  // }, [])
 
   useFrame(
     //   ({ camera }) => frontToCamera && groupRef.current.lookAt(camera.position)
     () => {
       const rotation = pivotRef.current?.rotation || {}
-      rotation.z = rotation.z += 0.0005 * idx
+      rotation.z += 0.0008 * orbitalPeriod
     }
   )
+
+  // const zStart = (startTime / 60 / 60 / 24) * orbitalPeriod * (Math.PI / 180)
+  const zStart =
+    ((dt.getSeconds() + 60 * dt.getMinutes() + 60 * 60 * dt.getHours()) /
+      60 /
+      60 /
+      24) *
+    orbitalPeriod *
+    (Math.PI / 180)
+
+  // console.log('render', zStart * 10000)
 
   return (
     <group
@@ -67,7 +95,7 @@ export default function Orbit({
     >
       <group>
         <lineLoop
-          rotation={new THREE.Euler(-Math.PI / 2, 0, 0)}
+          rotation={new THREE.Euler(-Math.PI / 2, 0, zStart * 10000)}
           ref={pivotRef}
           position={new THREE.Vector3(0, 0, 0)}
           geometry={geometry}
@@ -100,3 +128,5 @@ export default function Orbit({
     </group>
   )
 }
+
+export default memo(Orbit)

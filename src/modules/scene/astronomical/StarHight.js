@@ -2,7 +2,7 @@ import React from 'react'
 import { useLoader } from 'react-three-fiber'
 import * as THREE from 'three'
 // import glowImg from './assets/glow.png'
-import starImg from './assets/star_surface.png'
+import starImg from '../assets/star_surface.png'
 
 export default function StarHight({
   // asset = glowImg,

@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import React, { useState, useMemo, useRef } from 'react'
 import { useThree, useFrame } from 'react-three-fiber'
-import fontFile from './assets/sans'
+import fontFile from '../assets/sans'
 
 export default function Text({
   children,

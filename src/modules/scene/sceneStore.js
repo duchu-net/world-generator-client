@@ -1,9 +1,11 @@
 // export const REDUCER_STORE_NAME = 'scene'
 export const CONSTANTS = {
   STORE_NAME: 'scene',
+  UPDATE_SETTINGS: 'scene/UPDATE_SETTINGS',
   CONTROLS_ATTACHED: 'scene/CONTROLS_ATTACHED',
   SELECT_SYSTEM: 'scene/SELECT_SYSTEM',
-  SELECT_SYSTEM_: 'scene/SELECT_SYSTEM_'
+  SELECT_SYSTEM_: 'scene/SELECT_SYSTEM_',
+  SELECT_PLANET: 'scene/SELECT_PLANET'
 }
 
 const { STORE_NAME } = CONSTANTS
@@ -36,6 +38,17 @@ export function reducer(state = initialState, action) {
       // console.log(action, state, { ...state, selected: action.payload })
       return { ...state, selected: action.payload }
     }
+    case CONSTANTS.SELECT_PLANET: {
+      const [system, planet] = action.payload.split('/')
+      console.log('SELECT_PLANET', system, planet)
+      return { ...state, selected: { system, planet } }
+    }
+    // case CONSTANTS.UPDATE_SETTINGS: {
+    //   return {
+    //     ...state,
+    //     settings: { ...state.settings, scene: action.payload }
+    //   }
+    // }
     default:
       return state
   }
@@ -56,10 +69,20 @@ export const selectors = {
     return selectors.getSelected(state) === code
   },
   isSystemSelected(state, code) {
-    const selected = selectors.getSelected(state)
+    let selected = selectors.getSelected(state)
+    if (selected?.system) selected = selected.system
     return (
       selected === code ||
       (typeof selected === 'string' && selected.startsWith(code + '.'))
+    )
+  },
+  // @TODO
+  isPlanetSelected(state, code) {
+    let selected = selectors.getSelected(state)
+    if (selected?.planet) selected = selected.planet
+    return (
+      selected === code ||
+      (typeof selected === 'string' && selected.startsWith(code))
     )
   }
 }
@@ -76,5 +99,9 @@ export const actions = {
   },
   controlsAttached() {
     return { type: CONSTANTS.CONTROLS_ATTACHED }
-  }
+  },
+  updateSettings: (payload) => ({
+    type: CONSTANTS.UPDATE_SETTINGS,
+    payload
+  })
 }

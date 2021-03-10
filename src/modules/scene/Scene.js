@@ -1,39 +1,25 @@
-import React, { useRef, useEffect, forwardRef, useState } from 'react'
-// import ReactDOM from "react-dom";
-import { connect } from 'react-redux'
+import React, { useRef, useEffect } from 'react'
 import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import * as THREE from 'three'
-// import * as TWEEN from "tween";
-import { OrbitControls } from './assets/OrbitControls'
-import {
-  extend,
-  useThree,
-  useFrame,
-  Canvas
-  // Scene
-} from 'react-three-fiber'
-// import { Galaxy } from 'xenocide-world-generator'
-import { generatorActions, generatorSelectors } from '../generator'
-// import Interface from "./interface/Interface";
-// import useStore, { useSelectedSystem } from "../store";
-// import Star from './Star'
-import System from './System'
+import { extend, useThree, useFrame, Canvas } from 'react-three-fiber'
+import { OrbitControls } from './utils/OrbitControls'
 import { actions, selectors } from './sceneStore'
-// import GalaxyStarsPoints from './GalaxyStarsPoints'
-import Systems from './Systems'
-import SquareGrid from './SquareGrid'
 
 extend({ OrbitControls })
 
-export const Controls = ({ onAttach = () => {}, ...props }) => {
-  const { gl, camera } = useThree()
+export const Controls = ({ onAttach = () => {}, cameraProps, ...props }) => {
+  const { gl, camera, setDefaultCamera } = useThree()
   const controls = useRef()
+  const cameraRef = useRef()
+
   useFrame((state, delta) => {
     if (controls.current) {
       controls.current.update()
       controls.current.updateTween()
     }
   })
+
   useEffect(() => {
     const width = window.innerWidth
     const height = window.innerHeight
@@ -41,35 +27,67 @@ export const Controls = ({ onAttach = () => {}, ...props }) => {
     camera.controls = controls.current
     camera.setViewOffset(width, height, -(containerWidth / 2), 0, width, height)
     onAttach()
-    // console.log('controls', camera, controls)
-    // camera&&control ? (camera.controls = controls.current) : ''
   }, [camera])
+
+  useEffect(() => {
+    setDefaultCamera(cameraRef.current)
+    cameraRef.current.updateTarget = function (targetObj) {
+      console.log('camera updateTarget', this.isCamera)
+    }
+  }, [])
+
   // if (controls.current) {
   //   controls.current.cameraTo(new THREE.Vector3(0, 0, 0), 1, 1, 150, 4000);
   // }
   return (
-    <orbitControls ref={controls} args={[camera, gl.domElement]} {...props} />
+    <>
+      <perspectiveCamera ref={cameraRef} {...cameraProps} />
+      <orbitControls ref={controls} args={[camera, gl.domElement]} {...props} />
+    </>
   )
 }
 
-export function Scene({
-  settings: { fov },
-  systemCodes,
-  initGenerator,
-  controlsAttached
-}) {
-  useEffect(() => {
-    initGenerator()
-    return () => {}
-  }, [])
+// export const Camera = (props) => {
+//   const cameraRef = useRef()
+//   const pivotRef = useRef()
+//   const { setDefaultCamera } = useThree()
 
-  const groupRef = useRef()
+//   useEffect(() => {
+//     setDefaultCamera(cameraRef.current)
+//     let temp = new THREE.Vector3()
+//     cameraRef.current.updateTarget = function (targetObj) {
+//       console.log('camera updateTarget', this.isCamera)
+//       // temp.setFromMatrixPosition(targetObj.matrixWorld)
+//       // this.position.lerp(temp, 0.2)
+//       // const temp2 = new THREE.Vector3()
+//       // targetObj.getWorldPosition(temp2)
+//       // this.lookAt(targetObj.position)
 
+//       // this.getWorldPosition(temp)
+//       // targetObj.add(pivotRef.current)
+//       // this.position = this.worldToLocal(temp)
+//       // // this.controls.cameraTo(new THREE.Vector3(0, 0, 10))
+//     }
+//   }, [])
+//   // useFrame(() => cameraRef.current.updateMatrixWorld())
+
+//   return (
+//     <group ref={pivotRef}>
+//       <perspectiveCamera ref={cameraRef} {...props} />
+//     </group>
+//   )
+// }
+
+export function Scene({ settings, controlsAttached, children }) {
   return (
     <Canvas
       className="canvas"
-      // ref={canvasRef}
-      camera={{ position: [0, 50, 50], near: 0.01, far: 10000, fov }}
+      // camera={{
+      //   position: [0, 50, 50],
+      //   near: 0.01,
+      //   far: 10000,
+      //   fov: settings.fov
+      // }}
       onCreated={({ gl, camera }) => {
         console.log('onCreated')
         // actions.init(camera);
@@ -80,27 +98,32 @@ export function Scene({
         gl.setClearColor(new THREE.Color('#020207'))
       }}
     >
+      {/* <Camera
+        position={[0, 50, 50]}
+        near={0.01}
+        far={10000}
+        fov={settings.fov}
+      /> */}
       <scene>
         <Controls
           onAttach={() => controlsAttached()}
           enableDamping
           rotateSpeed={0.3}
           dampingFactor={0.1}
+          cameraProps={{
+            position: [0, 50, 50],
+            near: 0.01,
+            far: 10000,
+            fov: settings.fov
+          }}
         />
-        <ambientLight intensity={0.1} color="white" />
-        {/* <GalaxyStarsPoints /> */}
-        {/* <Systems /> */}
+        <ambientLight intensity={0.15} color="white" />
+        {/* <SquareGrid /> */}
+        {/* <axisHelper /> */}
 
-        {/* <SquareGrid />
-        <axisHelper /> */}
-
-        <group ref={groupRef}>
-          {/* <fog attach="fog" args={["black", 100, 700]} /> */}
-          {/* <ambientLight intensity={0.25} /> */}
-          {systemCodes.map((code, idx) => (
-            <System key={code} code={code} />
-          ))}
-        </group>
+        {/* <fog attach="fog" args={["black", 100, 700]} /> */}
+        {/* <ambientLight intensity={0.25} /> */}
+        {children}
       </scene>
     </Canvas>
   )
@@ -109,13 +132,12 @@ export function Scene({
 const makeMapStateToProps = (initialState, initialProps) => {
   const mapStateToProps = (state) => {
     return {
-      settings: selectors.getSettings(state),
-      systemCodes: generatorSelectors.getSystemCodes(state)
+      settings: selectors.getSettings(state)
     }
   }
   return mapStateToProps
 }
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ ...generatorActions, ...actions }, dispatch)
+  bindActionCreators({ ...actions }, dispatch)
 
 export default connect(makeMapStateToProps, mapDispatchToProps)(Scene)
