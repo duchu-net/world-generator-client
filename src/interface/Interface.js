@@ -10,12 +10,14 @@ import { Text } from './typo'
 export function Interface({
   initGenerator,
   setGenerator,
+  updateSettings,
   galaxy,
   systemCodes,
   // systems,
   // selected,
   select,
-  settings
+  settings,
+  sceneSettings
 }) {
   // const [selectedSystem, setSelectedSystem] = useSelectedSystem();
 
@@ -61,6 +63,23 @@ export function Interface({
           </div>
 
           {/* <div className={'container info'}> */}
+          {/* <Text tag={'div'} size={4} className={'scene info'}>
+            <div className={'center'}>Scene Info</div>
+            <div>
+              <span>fov: {sceneSettings.fov}</span>
+              <input
+                type="range"
+                min="10"
+                max="1000"
+                value={sceneSettings.fov}
+                id="scene_fov"
+                onChange={(event) =>
+                  updateSettings({ fov: event.target.value })
+                }
+              />
+            </div>
+          </Text> */}
+
           <Text tag={'div'} size={4} className={'container info'}>
             <div className={'center'}>Galaxy Info</div>
             <div>
@@ -87,17 +106,6 @@ export function Interface({
               // system={system}
             />
           )
-          // return (
-          //   <div
-          //     key={system.name}
-          //     onClick={() => select(star.code)}
-          //     className={'system ' + (isSelected ? 'selected' : '')}
-          //   >
-          //     <a href={`#${system.code}`} id={system.code} />
-          //     {STAR_TYPES_BY_STARS_COUNT[system.stars.length]} [
-          //     {system.stars.map(star => star.subtype).join('-')}] {system.name},
-          //   </div>
-          // )
         })}
       </div>
     </div>
@@ -105,9 +113,10 @@ export function Interface({
 }
 
 const makeMapStateToProps = (initialState, initialProps) => {
-  const mapStateToProps = state => {
+  const mapStateToProps = (state) => {
     return {
       settings: generatorSelectors.getSettings(state),
+      sceneSettings: sceneSelectors.getSettings(state),
       galaxy: generatorSelectors.getGalaxy(state),
       systemCodes: generatorSelectors.getSystemCodes(state),
       selected: sceneSelectors.getSelected(state)
@@ -115,10 +124,7 @@ const makeMapStateToProps = (initialState, initialProps) => {
   }
   return mapStateToProps
 }
-const mapDispatchToProps = dispatch =>
+const mapDispatchToProps = (dispatch) =>
   bindActionCreators({ ...generatorActions, ...sceneActions }, dispatch)
 
-export default connect(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(memo(Interface))
+export default connect(makeMapStateToProps, mapDispatchToProps)(memo(Interface))

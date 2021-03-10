@@ -22,7 +22,19 @@ const STAR_TYPE_BY_SUBTYPE = {
   M: ['red dwarf', 'red giant', 'red supergiant'].join('/')
 }
 
-function SystemsListItem({ system = {}, selected, select }) {
+const PLANET_COLOR_BY_SUBTYPE = {
+  ASTEROID_BELT: 'rgba(255,255,255,0.2)',
+  lava: '#f44336',
+  barren: '#9e9e9e',
+  earth: '#4caf50',
+  ocean: '#2196f3',
+  desert: '#ffeb3b',
+  ice: '#b3e5fc',
+  gas_giant: '#ff9800',
+  ice_giant: '#00e5ff'
+}
+
+function SystemsListItem({ system = {}, planets, selected, select }) {
   const listItemRef = useRef()
 
   useEffect(() => {
@@ -51,7 +63,9 @@ function SystemsListItem({ system = {}, selected, select }) {
         </div>
         <Text tag="div" size="4">
           <div style={{ opacity: 0.7 }}>
-            planets: [*demo]
+            planets:{' '}
+            {planets.filter((planet) => planet.type == 'PLANET').length ||
+              'pristine*'}
             <div className={isHabitable ? 'habitable' : 'unhabitable'}>
               {/* habitable: {isHabitable ? 'yes' : 'no'} */}
             </div>
@@ -60,6 +74,7 @@ function SystemsListItem({ system = {}, selected, select }) {
         </Text>
       </div>
       {/* <div className={'center'}>stars</div> */}
+
       <div className={'stars-list'}>
         {system.stars.map((star) => (
           <div
@@ -82,6 +97,24 @@ function SystemsListItem({ system = {}, selected, select }) {
           </div>
         ))}
       </div>
+      {isSelected && planets.length > 0 && (
+        <div className={'planets-list'}>
+          {/* {console.log(system.planets)} */}
+          {planets.map((planet) => (
+            <div
+              key={planet.code}
+              className={'planets-list-item'}
+              style={{
+                background: PLANET_COLOR_BY_SUBTYPE[planet.subtype] || 'white'
+              }}
+            >
+              <div>{planet.designation}</div>
+              <div>subtype: {String(planet.subtype).toLocaleLowerCase()}</div>
+              <div>zone: {planet.zone}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -90,7 +123,8 @@ const makeMapStateToProps = (initialState, { code }) => {
   const mapStateToProps = (state) => {
     return {
       selected: sceneSelectors.isSystemSelected(state, code),
-      system: generatorSelectors.getSystemByCode(state, code)
+      system: generatorSelectors.getSystemByCode(state, code),
+      planets: generatorSelectors.getSystemPlanets(state, code)
     }
   }
   return mapStateToProps

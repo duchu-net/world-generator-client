@@ -1,5 +1,12 @@
 import { Galaxy } from 'xenocide-world-generator'
 
+// import worker from 'worker-plugin/loader?name=foo&esModule!./worker'
+// import MyWorker from 'worker-plugin/loader?esModule!./my.worker'
+// import MyWorker from 'worker-loader!./my.worker'
+// import MyWorker from './my.worker.js'
+// import worker from './worker'
+// import WorkerSetup from './workerSetup'
+
 export const CONSTANTS = {
   STORE_NAME: 'generator',
   GENERATOR_STATUS: {
@@ -57,6 +64,12 @@ export function reducer(state = initialState, action) {
     }
     case CONSTANTS.COMPLETED: {
       console.log(CONSTANTS.COMPLETED, action.payload)
+      // console.log(
+      //   JSON.stringify({
+      //     ...state,
+      //     status: GENERATOR_STATUS.COMPLETED
+      //   })
+      // )
       return {
         ...state,
         status: GENERATOR_STATUS.COMPLETED
@@ -99,11 +112,56 @@ export const selectors = {
   },
   getSystemByCode(state, code) {
     return state[STORE_NAME].systemByCode[code]
+  },
+  getSystemPlanets(state, code) {
+    // console.log(state[STORE_NAME].systemByCode[code]?.planets)
+    return state[STORE_NAME].systemByCode[code]?.planets.filter(
+      // (planet) => planet.type === 'PLANET'
+      (planet) => planet.type !== 'EMPTY'
+    )
   }
 }
 
 async function generate(dispatch, generator) {
   console.log('> start generator', generator)
+  if (generator.classification === 'spiral')
+    alert(
+      'don`t panic! `spiral` may take a while, be patient, also only 3 generated systems will be available - performance ;)'
+    )
+
+  /** */
+  try {
+    // console.log(Worker)
+    // let myWorker = new Worker('./generator.worker.js', { type: 'module' })
+    // console.log(MyWorker)
+    // let myWorker = new MyWorker()
+    // let myWorker = new WorkerSetup(MyWorker)
+    // console.log(myWorker)
+    // myWorker.addEventListener('message', ({ data }) => {
+    //   console.log('!!! worker', data)
+    // })
+    // myWorker.onmessage = function (event) {
+    //   console.log('@@@', event)
+    // }
+    // myWorker.postMessage({ generator })
+  } catch (err) {
+    console.log(err)
+  }
+  /** */
+  // const worker = new Worker('generator.worker.js', { type: 'module' })
+  // worker.addEventListener('message', ({ data }) => {
+  //   //   // this.setState({ workerMessage: data });
+  //   console.log('worker', data)
+  //   //   if (data.galaxy) dispatch(actions.updateGalaxy(data.galaxy))
+  //   //   if (data.system) dispatch(actions.updateGalaxy(data.system))
+  //   //   if (data.status === 'COMPLETED') {
+  //   // worker.terminate()
+  //   //     console.log(`# finish generator`)
+  //   //     // resolve()
+  //   //   }
+  // })
+  // worker.postMessage({ generator })
+  // /** */
 
   const galaxy = new Galaxy({
     ...generator,
@@ -137,26 +195,32 @@ async function generate(dispatch, generator) {
   // }
   // await Promise.all(promises);
 
+  let onflyDemo = 3
   for (const system of galaxy.generateSystems()) {
     if (!isRunning) return
     // await system.build()
     // console.log("** System generated:", system.name, system.code);
     for (const star of system.generateStars()) {
-      // console.log("* Star generated:", star.designation, star.code, star);
+      // console.log('* Star generated:', star.designation, star.code, star)
       // if (Array.isArray(system.stars)) system.stars = [];
       // system.stars.push(star);
     }
+    if (generator.classification == 'grid' || onflyDemo > 0) {
+      // onflyDemo = false
+      onflyDemo -= 1
+      for (let planet of system.generatePlanets()) {
+        // console.log('* Planet generated:', planet.designation, planet.code)
+        // console.log(planet)
+      }
+    }
     systemsTemp.push(system)
     dispatch(actions.updateSystem(system))
-    // for (let planet of system.generatePlanets()) {
-    //   console.log("* Planet generated:", planet.designation, planet.code);
-    // }
   }
   console.log(`> finish generator, ${systemsTemp.length} systems generated`)
 }
 
 let isRunning = false
-export const middleware = store => next => async action => {
+export const middleware = (store) => (next) => async (action) => {
   // console.log("middleware", isRunning);
   next(action)
   switch (action.type) {
