@@ -8,6 +8,7 @@ import Planet from './Planet'
 import Orbit from '../utils/Orbit'
 import PolarGrid from '../utils/PolarGrid'
 import AsteroidBelt from './AsteroidBelt'
+import GalaxyStarsPoints from './GalaxyStarsPoints'
 
 const store = getStore()
 
@@ -35,6 +36,7 @@ export function SystemPlane({ code, name }) {
 
   return (
     <>
+      {/* <GalaxyStarsPoints /> */}
       <Text
         color="white"
         size={1}
@@ -102,7 +104,8 @@ export function SystemPlane({ code, name }) {
             return (
               <AsteroidBelt
                 key={planet.code}
-                object={planet}
+                data={planet}
+                systemCode={code}
                 radius={planet.orbit.from_star * 1.5 + 2}
               />
             )
@@ -131,8 +134,10 @@ const PlanetOrbitPlane = memo(({ planet, code }) => (
       <Planet
         name={planet.designation}
         type={planet.subtype}
+        data={planet}
         color={'lightblue'}
         scale={0.3}
+        from_star={planet.orbit.from_star}
         systemCode={code}
         planetCode={planet.code}
       />

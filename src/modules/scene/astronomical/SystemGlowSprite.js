@@ -3,12 +3,12 @@ import { useLoader } from 'react-three-fiber'
 import * as THREE from 'three'
 import glowImg from '../assets/glow.png'
 
-export default function SystemGlow({
+const SystemGlowSprite = ({
   asset = glowImg,
+  scale = 6,
   color = '#ffffff',
-  position = [0, 0, 0],
-  scale = 6
-}) {
+  position = [0, 0, 0]
+}) => {
   const texture = useLoader(THREE.TextureLoader, asset)
 
   return (
@@ -19,8 +19,8 @@ export default function SystemGlow({
         new THREE.SpriteMaterial({
           color,
           map: texture,
-          blending: THREE.AdditiveBlending,
           opacity: 0.5,
+          blending: THREE.AdditiveBlending,
           transparent: true
         })
       }
@@ -28,3 +28,5 @@ export default function SystemGlow({
     />
   )
 }
+
+export default SystemGlowSprite

@@ -1,12 +1,19 @@
 {
-  "name": "world-generator-react-threejs-react-three-fiber",
+  "name": "procedural-galaxy-generator-client-react-threejs-react-three-fiber",
   "version": "1.0.0",
-  "description": "",
+  "description": "chrome experiments: procedural world generator + react client for demo",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
     "@babel/core": "7.7.4",
     "@babel/plugin-proposal-optional-chaining": "7.7.4",
+    "@emotion/react": "11.7.1",
+    "@emotion/styled": "11.6.0",
+    "@mui/material": "5.3.1",
+    "@react-three/drei": "3.10.2",
+    "@react-three/fiber": "7.0.10",
+    "classnames": "2.2.6",
+    "node-sass": "5.0.0",
     "prop-types": "15.7.2",
     "react": "17.0.1",
     "react-app-rewired": "2.1.8",
@@ -21,7 +28,7 @@
     "webpack": "5.24.3",
     "worker-loader": "3.0.8",
     "worker-plugin": "5.0.0",
-    "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator",
+    "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator#prealpha_0.0.2-rc.1",
     "zustand": "2.2.1"
   },
   "devDependencies": {

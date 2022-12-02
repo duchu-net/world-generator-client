@@ -6,7 +6,10 @@ import { a } from 'react-spring/three'
 import { getStore } from '../../../store'
 import { selectors } from '../sceneStore'
 import Text from '../utils/Text'
+import Selector from '../utils/Selector'
 import PlanetMedium from './PlanetMedium'
+import PlanetHigh from './PlanetHigh'
+import HtmlLabel from './HtmlLabel'
 
 const store = getStore()
 
@@ -27,21 +30,24 @@ function Planet({
   scale = 1,
   name = 'xyz',
   type,
+  data = {},
   systemCode,
   planetCode,
+  from_star,
   ...props
 }) {
   const [settings, setSettings] = useState(
     selectors.getSettings(store.getState(), 'planet')
   )
   const [selected, setSelected] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const { camera } = useThree()
 
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
       setSettings(selectors.getSettings(store.getState(), 'planet'))
       // @TODO
-      setSelected(selectors.isPlanetSelected(store.getState(), planetCode))
+      setSelected(selectors.isObjectSelected(store.getState(), planetCode))
     })
     return () => {
       unsubscribe()
@@ -53,12 +59,32 @@ function Planet({
     if (selected) camera.updateTarget(ref.current)
   }, [selected, camera])
 
+  const handleSelectPlanet = (event) => {
+    event.stopPropagation()
+    store.dispatch({
+      type: 'scene/SELECT_SYSTEM',
+      payload: { system: systemCode, object: data.code }
+    })
+  }
+
+  const showSelector = selected || isHovered
+
   return (
     <group
       ref={ref}
       // scale={[scale, scale, scale]}
       position={position}
     >
+      <HtmlLabel
+        // position={new THREE.Vector3(radius, 0, 0)}
+        show={isHovered || selected}
+        type={'planet'}
+        subtype={type}
+        designation={data.designation || name}
+        data={data}
+        onClick={handleSelectPlanet}
+        // orbit={data.orbit}
+      />
       {settings['name.show'] && (
         <Text
           frontToCamera
@@ -80,13 +106,14 @@ function Planet({
         children={'xyz'}
       /> */}
       <group
-        onClick={(e) => {
+        onClick={handleSelectPlanet}
+        onPointerOver={(e) => {
           e.stopPropagation()
-          console.log('select planet')
-          store.dispatch({
-            type: 'scene/SELECT_PLANET',
-            payload: `${systemCode}/${planetCode}`
-          })
+          setIsHovered(true)
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation()
+          setIsHovered(false)
         }}
         scale={[scale, scale, scale]}
       >
@@ -102,6 +129,11 @@ function Planet({
           fallback={null}
         >
           <PlanetMedium type={type} />
+          {/* {from_star == 1 ? (
+            <PlanetHigh type={type} />
+          ) : (
+            <PlanetMedium type={type} />
+          )} */}
         </Suspense>
         <mesh
           geometry={new THREE.SphereBufferGeometry(0.95, 16, 16)}
@@ -120,21 +152,7 @@ function Planet({
       </group>
 
       {/* @TODO */}
-      {selected && (
-        <a.mesh
-          geometry={new THREE.IcosahedronGeometry(1.3, 1)}
-          material={
-            new THREE.MeshBasicMaterial({
-              color: new THREE.Color('#1e88e5'),
-              transparent: true,
-              wireframe: true,
-              opacity: 0.3
-              // opacity: hovered ? 0.1 : 0.2
-            })
-          }
-          // visible={hovered || selected}
-        />
-      )}
+      {showSelector && <Selector hovered={isHovered} />}
     </group>
   )
 }

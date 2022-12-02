@@ -7,6 +7,7 @@ import {
   GENERATOR
 } from '../../generator'
 import System from './System'
+// import GalaxyStarsPoints from './GalaxyStarsPoints'
 
 const store = getStore()
 
@@ -31,6 +32,7 @@ export default function Galaxy() {
   const groupRef = useRef()
   return (
     <group ref={groupRef}>
+      {/* @TODO if (system selected) <><GalaxyStarsPoints /><System/></> else */}
       {/* <fog attach="fog" args={["black", 100, 700]} /> */}
       {systemCodes.map((code, idx) => (
         <System key={`${idx}_${code}`} code={code} />
