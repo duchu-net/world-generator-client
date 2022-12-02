@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux'
 import { generatorActions, generatorSelectors } from '../modules/generator'
 import { sceneSelectors, sceneActions } from '../modules/scene'
 import SystemsListItem from './SystemsListItem'
+import AboutModal from './AboutModal'
 import { Text } from './typo'
 
 export function Interface({
@@ -25,6 +26,7 @@ export function Interface({
     <div className="Interface">
       <div className="main-container">
         <div>
+          {/* <AboutModal /> */}
           <div className={'generator center'}>
             <div className={'setters'}>
               <button

@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as THREE from 'three'
 import { extend, useThree, useFrame, Canvas } from 'react-three-fiber'
+import { Stats } from '@react-three/drei/core/Stats'
 import { OrbitControls } from './utils/OrbitControls'
 import { actions, selectors } from './sceneStore'
 
@@ -36,9 +37,6 @@ export const Controls = ({ onAttach = () => {}, cameraProps, ...props }) => {
     }
   }, [])
 
-  // if (controls.current) {
-  //   controls.current.cameraTo(new THREE.Vector3(0, 0, 0), 1, 1, 150, 4000);
-  // }
   return (
     <>
       <perspectiveCamera ref={cameraRef} {...cameraProps} />
@@ -47,63 +45,16 @@ export const Controls = ({ onAttach = () => {}, cameraProps, ...props }) => {
   )
 }
 
-// export const Camera = (props) => {
-//   const cameraRef = useRef()
-//   const pivotRef = useRef()
-//   const { setDefaultCamera } = useThree()
-
-//   useEffect(() => {
-//     setDefaultCamera(cameraRef.current)
-//     let temp = new THREE.Vector3()
-//     cameraRef.current.updateTarget = function (targetObj) {
-//       console.log('camera updateTarget', this.isCamera)
-//       // temp.setFromMatrixPosition(targetObj.matrixWorld)
-//       // this.position.lerp(temp, 0.2)
-//       // const temp2 = new THREE.Vector3()
-//       // targetObj.getWorldPosition(temp2)
-//       // this.lookAt(targetObj.position)
-
-//       // this.getWorldPosition(temp)
-//       // targetObj.add(pivotRef.current)
-//       // this.position = this.worldToLocal(temp)
-//       // // this.controls.cameraTo(new THREE.Vector3(0, 0, 10))
-//     }
-//   }, [])
-//   // useFrame(() => cameraRef.current.updateMatrixWorld())
-
-//   return (
-//     <group ref={pivotRef}>
-//       <perspectiveCamera ref={cameraRef} {...props} />
-//     </group>
-//   )
-// }
-
 export function Scene({ settings, controlsAttached, children }) {
   return (
     <Canvas
       className="canvas"
-      // camera={{
-      //   position: [0, 50, 50],
-      //   near: 0.01,
-      //   far: 10000,
-      //   fov: settings.fov
-      // }}
       onCreated={({ gl, camera }) => {
         console.log('onCreated')
-        // actions.init(camera);
-        // gl.getShaderInfoLog = () => {}
-        // gl.getProgramInfoLog = () => {}
-        // gl.gammaInput = true
-        // gl.toneMapping = THREE.Uncharted2ToneMapping
         gl.setClearColor(new THREE.Color('#020207'))
       }}
     >
-      {/* <Camera
-        position={[0, 50, 50]}
-        near={0.01}
-        far={10000}
-        fov={settings.fov}
-      /> */}
+      {settings.stats_show && <Stats showPanel={0} className="stats" />}
       <scene>
         <Controls
           onAttach={() => controlsAttached()}
@@ -120,7 +71,6 @@ export function Scene({ settings, controlsAttached, children }) {
         <ambientLight intensity={0.15} color="white" />
         {/* <SquareGrid /> */}
         {/* <axisHelper /> */}
-
         {/* <fog attach="fog" args={["black", 100, 700]} /> */}
         {/* <ambientLight intensity={0.25} /> */}
         {children}
@@ -137,7 +87,6 @@ const makeMapStateToProps = (initialState, initialProps) => {
   }
   return mapStateToProps
 }
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ ...actions }, dispatch)
+const mapDispatchToProps = (dispatch) => bindActionCreators({ ...actions }, dispatch)
 
 export default connect(makeMapStateToProps, mapDispatchToProps)(Scene)

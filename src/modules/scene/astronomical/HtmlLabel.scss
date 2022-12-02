@@ -1,0 +1,24 @@
+.html-label {
+  width: 180px;
+  // transform: translate3d(50%, 0, 0); 
+  font-size: 10px;
+  text-align: left;
+  background: black;
+  // color: white;
+  color: rgba(255,255,255,.5);
+  padding: 5px;
+  border-radius: 3px;
+  border: #1e88e5 1px solid;
+
+  .name {
+    color: white;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  .type,.subtype {
+    text-transform: uppercase;
+  }
+  .value {
+    color: white;
+  }
+}

@@ -1,3 +1,4 @@
+/** experiment - any importable worker not work for codesandbox */
 // import { CALL_API } from './enums'
 import { Galaxy } from 'xenocide-world-generator'
 // const Galaxy = require('xenocide-world-generator')

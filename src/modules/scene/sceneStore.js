@@ -16,7 +16,7 @@ const initialState = {
   // settings: { fov: 70 },
   settings: {
     // system_glow: { active: true },
-    scene: { fov: 70 },
+    scene: { fov: 70, stats_show: true },
     galaxy: {},
     system: {
       'cage.show': true
@@ -65,25 +65,27 @@ export const selectors = {
     // console.log('getSelected', state)
     return state[STORE_NAME].selected
   },
+  // getPlanet(state) {
+
+  // },
   isSelected(state, code) {
     return selectors.getSelected(state) === code
   },
   isSystemSelected(state, code) {
     let selected = selectors.getSelected(state)
     if (selected?.system) selected = selected.system
-    return (
-      selected === code ||
-      (typeof selected === 'string' && selected.startsWith(code + '.'))
-    )
+    return selected === code || (typeof selected === 'string' && selected.startsWith(code + '.'))
+  },
+  isObjectSelected(state, code) {
+    let selected = selectors.getSelected(state)
+    if (selected?.object) selected = selected.object
+    return selected === code
   },
   // @TODO
   isPlanetSelected(state, code) {
     let selected = selectors.getSelected(state)
     if (selected?.planet) selected = selected.planet
-    return (
-      selected === code ||
-      (typeof selected === 'string' && selected.startsWith(code))
-    )
+    return selected === code
   }
 }
 

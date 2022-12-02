@@ -1,12 +1,5 @@
 import { Galaxy } from 'xenocide-world-generator'
 
-// import worker from 'worker-plugin/loader?name=foo&esModule!./worker'
-// import MyWorker from 'worker-plugin/loader?esModule!./my.worker'
-// import MyWorker from 'worker-loader!./my.worker'
-// import MyWorker from './my.worker.js'
-// import worker from './worker'
-// import WorkerSetup from './workerSetup'
-
 export const CONSTANTS = {
   STORE_NAME: 'generator',
   GENERATOR_STATUS: {
@@ -17,6 +10,7 @@ export const CONSTANTS = {
   COMPLETED: 'generator/COMPLETED',
   INIT: 'generator/INIT',
   SYSTEM: 'generator/SYSTEM',
+  SYSTEMS: 'generator/SYSTEMS',
   GALAXY: 'generator/GALAXY',
   SET_GENERATOR: 'scene/SET_GENERATOR'
 }
@@ -32,14 +26,12 @@ const initialState = {
     : { classification: 'spiral' },
   galaxy: {},
 
-  systems: [],
+  // systems: [],
   systemCodes: [],
   systemByCode: {}
 }
 
 export function reducer(state = initialState, action) {
-  // console.log(action.type);
-  // console.log(action.type, action.selected, action.payload);
   switch (action.type) {
     // case "3d/INIT": {
     //   return { ...state, counter: state.counter + 1 };
@@ -57,19 +49,13 @@ export function reducer(state = initialState, action) {
         ...state,
         status: GENERATOR_STATUS.RUNNING,
         galaxy: {},
-        systems: [],
+        // systems: [],
         systemCodes: [],
         systemByCode: {}
       }
     }
     case CONSTANTS.COMPLETED: {
       console.log(CONSTANTS.COMPLETED, action.payload)
-      // console.log(
-      //   JSON.stringify({
-      //     ...state,
-      //     status: GENERATOR_STATUS.COMPLETED
-      //   })
-      // )
       return {
         ...state,
         status: GENERATOR_STATUS.COMPLETED
@@ -78,12 +64,22 @@ export function reducer(state = initialState, action) {
     case CONSTANTS.SYSTEM: {
       return {
         ...state,
-        systems: [...state.systems, action.payload],
+        // systems: [...state.systems, action.payload],
         systemCodes: [...state.systemCodes, action.payload.code],
         systemByCode: {
           ...state.systemByCode,
           [action.payload.code]: action.payload
         }
+      }
+    }
+    case CONSTANTS.SYSTEMS: {
+      return {
+        ...state,
+        systemCodes: action.payload.map((item) => item.code),
+        systemByCode: action.payload.reduce((prev, curr) => {
+          prev[curr.code] = curr
+          return prev
+        }, {})
       }
     }
     case CONSTANTS.GALAXY: {
@@ -105,7 +101,10 @@ export const selectors = {
     return state[STORE_NAME].galaxy
   },
   DEPRECATED_getSystems(state) {
-    return state[STORE_NAME].systems
+    //   return state[STORE_NAME].systems
+  },
+  getSystems(state) {
+    return state[STORE_NAME].systemByCode
   },
   getSystemCodes(state) {
     return state[STORE_NAME].systemCodes
@@ -114,11 +113,7 @@ export const selectors = {
     return state[STORE_NAME].systemByCode[code]
   },
   getSystemPlanets(state, code) {
-    // console.log(state[STORE_NAME].systemByCode[code]?.planets)
-    return state[STORE_NAME].systemByCode[code]?.planets.filter(
-      // (planet) => planet.type === 'PLANET'
-      (planet) => planet.type !== 'EMPTY'
-    )
+    return state[STORE_NAME].systemByCode[code]?.planets
   }
 }
 
@@ -126,7 +121,7 @@ async function generate(dispatch, generator) {
   console.log('> start generator', generator)
   if (generator.classification === 'spiral')
     alert(
-      'don`t panic! `spiral` may take a while, be patient, also only 3 generated systems will be available - performance ;)'
+      'don`t panic! `spiral` may take a while, be patient, also only 3 first generated systems will be available - performance ;)'
     )
 
   /** */
@@ -173,10 +168,11 @@ async function generate(dispatch, generator) {
   console.log('*** Galaxy generated:', galaxy.name, galaxy.code)
   /**
    * @TODO generation in chunks
-   * - it takes too long to genere one item at a time
+   * - it takes too long to genere one item at a time,
+   *   but seeds are strongly depend on order
    * - parallel - generating multiple items asynchronously is fast
    *   but impossible to stop before the end
-   * solution: chunks?
+   * solution: chunks? (+generate subseeds instead of all in one?)
    **/
   // for async (const system of galaxy.generateSystems()) {
 
@@ -196,8 +192,10 @@ async function generate(dispatch, generator) {
   // await Promise.all(promises);
 
   let onflyDemo = 3
+  const systems = []
   for (const system of galaxy.generateSystems()) {
     if (!isRunning) return
+    systems.push(system)
     // await system.build()
     // console.log("** System generated:", system.name, system.code);
     for (const star of system.generateStars()) {
@@ -214,8 +212,9 @@ async function generate(dispatch, generator) {
       }
     }
     systemsTemp.push(system)
-    dispatch(actions.updateSystem(system))
+    // dispatch(actions.updateSystem(system))
   }
+  dispatch({ type: CONSTANTS.SYSTEMS, payload: systems })
   console.log(`> finish generator, ${systemsTemp.length} systems generated`)
 }
 

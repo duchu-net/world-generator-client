@@ -2,9 +2,13 @@ import * as THREE from 'three'
 import React, { useRef, useState, useEffect, Suspense } from 'react'
 import { useThree, useLoader } from 'react-three-fiber'
 import { a } from 'react-spring/three'
+import { Html } from '@react-three/drei/web/Html'
 import Text from '../utils/Text'
 import StarHight from './StarHight'
 import StarSprite from './StarSprite'
+import HtmlLabel from './HtmlLabel'
+import Selector from '../utils/Selector'
+import Selectable from '../utils/Selectable'
 
 import { getStore } from '../../../store'
 import { selectors } from '../sceneStore'
@@ -19,18 +23,20 @@ function changeColor(colorValue, hsL = 0.05) {
 }
 
 export default function Star({
+  data = {},
   position = [0, 0, 0],
   color = 'red',
   scale = 1,
   opacity = 1,
   quality = 'high',
+  systemCode,
   selectedSystem = false,
   ...props
 }) {
   const [selected, setSelected] = useState(false)
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
-      setSelected(selectors.getSelected(store.getState()) === props.code)
+      setSelected(selectors.isObjectSelected(store.getState(), data.code))
     })
     return () => {
       unsubscribe()
@@ -71,22 +77,30 @@ export default function Star({
 
   const ref = useRef()
   const [hovered, setHovered] = useState(false)
+  const [isInfoHovered, setIsInfoHovered] = useState(false)
   // if (selected) window.location.href = `#${props.code}`;
 
   const starColor = color ? changeColor(color, 0) : '#FFFF99'
 
   const renderLight = selectedSystem
   const renderText = hovered || selected
-  const renderCage = hovered
+  const showSelector = hovered || selected
+
+  const handleSelectSystem = (event) => {
+    event.stopPropagation()
+    store.dispatch({
+      type: 'scene/SELECT_SYSTEM',
+      payload: { system: systemCode, object: selectedSystem ? data.code : null }
+    })
+  }
+
+  // console.log('render star')
 
   return (
     <group
       ref={ref}
       position={position}
-      onClick={(e) => {
-        e.stopPropagation()
-        store.dispatch({ type: 'scene/SELECT_SYSTEM', payload: props.code })
-      }}
+      onClick={handleSelectSystem}
       onPointerOver={(e) => {
         e.stopPropagation()
         setHovered(true)
@@ -96,6 +110,33 @@ export default function Star({
         setHovered(false)
       }}
     >
+      <HtmlLabel
+        show={hovered || selected}
+        data={data}
+        // type={'star'}
+        subtype={props.type}
+        designation={props.designation}
+        onClick={handleSelectSystem}
+        // orbit={data.orbit}
+      />
+      {/* {(hovered || isInfoHovered) && ( */}
+      {/* {hovered && (
+        <Html position={new THREE.Vector3(0, 0, 0)}>
+          <div
+            className="asteroid-belt"
+            // onPointerOver={(e) => {
+            //   // e.stopPropagation()
+            //   setIsInfoHovered(true)
+            // }}
+            // onPointerOut={(e) => {
+            //   // e.stopPropagation()
+            //   setIsInfoHovered(false)
+            // }}
+          >
+            <div>star {props.designation}</div>
+          </div>
+        </Html>
+      )} */}
       {/* <mesh position={[0, 0, 0]}>
         <sphereBufferGeometry attach="geometry" args={[1.1, 32, 32]} />
         <meshStandardMaterial
@@ -173,22 +214,7 @@ export default function Star({
           // visible={hovered || selected}
         />
       )}
-      {/* {(hovered || selected) && ( */}
-      {renderCage && (
-        <a.mesh
-          // position={[0, 0, 0]}
-          geometry={new THREE.IcosahedronGeometry(1.5, 1)}
-          material={
-            new THREE.MeshBasicMaterial({
-              color: new THREE.Color('#1e88e5'),
-              transparent: true,
-              wireframe: true,
-              opacity: hovered ? 0.1 : 0.2
-            })
-          }
-          // visible={hovered || selected}
-        />
-      )}
+      {showSelector && <Selector hovered={hovered} size={1.5} />}
     </group>
   )
 }

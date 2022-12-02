@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { getStore } from '../../store'
+import { getStore } from '../../../store'
 import { generatorSelectors } from '../../generator'
 
 const store = getStore()
@@ -41,13 +41,7 @@ export default function GalaxyStarsPoints({}) {
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial
-        attach="material"
-        size={3}
-        sizeAttenuation
-        color="white"
-        fog={false}
-      />
+      <pointsMaterial attach="material" size={3} sizeAttenuation color="white" fog={false} />
     </points>
   )
 }

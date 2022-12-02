@@ -1,21 +1,15 @@
 import React from 'react'
 import { useLoader } from 'react-three-fiber'
 import * as THREE from 'three'
-// import glowImg from './assets/glow.png'
 import starImg from '../assets/star_surface.png'
 
 export default function StarHight({
-  // asset = glowImg,
   color = '#ffffff',
   scale = [1, 1, 1],
   position = [0, 0, 0]
 }) {
   const [texture] = useLoader(THREE.TextureLoader, [starImg])
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-  // const texture = useLoader(THREE.TextureLoader, asset)
-  // return <primitive object={gltf.scene} />
-  // texture.color = color
-  // console.log(texture, color)
 
   const material = new THREE.MeshPhongMaterial({
     color,

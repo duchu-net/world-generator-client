@@ -1,26 +1,12 @@
 import React, { memo, useRef, useState, useEffect, Suspense } from 'react'
 import * as THREE from 'three'
-import { useThree, useLoader } from 'react-three-fiber'
-// import { a } from 'react-spring/three'
-
+import HtmlLabel from './HtmlLabel'
 import ringImg from '../assets/saturn-rings-top.png'
-// import { getStore } from '../../../store'
-// import { selectors } from '../sceneStore'
-// import Text from '../utils/Text'
-// import PlanetMedium from './PlanetMedium'
 
-// const store = getStore()
+import { getStore } from '../../../store'
+import { selectors } from '../sceneStore'
 
-// function PlanetAsset({ asset }) {
-//   const texture = useLoader(THREE.TextureLoader, asset)
-//   const props = {
-//     roughness: 1,
-//     // color:color || '#FFFF99',
-//     map: texture,
-//     fog: false
-//   }
-//   return <material attach={'material'} {...props} />
-// }
+const store = getStore()
 
 function AsteroidBelt({
   position,
@@ -28,12 +14,23 @@ function AsteroidBelt({
   name = 'xyz',
   type,
   systemCode,
-  object,
+  data = {},
   radius,
   ...props
 }) {
   // const [texture] = useLoader(THREE.TextureLoader, [ringImg])
   const meshRef = useRef()
+  const [isHovered, setIsHovered] = useState(false)
+
+  const [selected, setSelected] = useState(false)
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      setSelected(selectors.isObjectSelected(store.getState(), data.code))
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
 
   // useEffect(() => {
   //   const { geometry } = meshRef.current
@@ -46,9 +43,38 @@ function AsteroidBelt({
   //   geometry.attributes.position.needsUpdate = true
   // },[])
 
+  const showSelector = isHovered || selected
+
+  const handleSelectSystem = (event) => {
+    event.stopPropagation()
+    store.dispatch({
+      type: 'scene/SELECT_SYSTEM',
+      payload: { system: systemCode, object: data.code }
+    })
+  }
+
   return (
     <group>
+      <HtmlLabel
+        show={showSelector}
+        position={new THREE.Vector3(radius, 0, 0)}
+        type={data.type}
+        // subtype={data.subtype}
+        designation={data.designation}
+        // orbit={data.orbit}
+        onClick={handleSelectSystem}
+        data={data}
+      />
       <mesh
+        onClick={handleSelectSystem}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setIsHovered(true)
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation()
+          setIsHovered(false)
+        }}
         ref={meshRef}
         // position={[0, 0, 0]}
         rotation={new THREE.Euler(Math.PI / 2, 0, 0)}
@@ -59,7 +85,7 @@ function AsteroidBelt({
             color: 0xffffff,
             side: THREE.DoubleSide,
             transparent: true,
-            opacity: 0.08
+            opacity: showSelector ? 0.2 : 0.08
           })
         }
       />
