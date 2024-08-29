@@ -25,7 +25,7 @@
     "redux": "4.0.4",
     "three": "^0.109.0",
     "tween": "0.9.0",
-    "webpack": "5.24.3",
+    "webpack": "5.94.0",
     "worker-loader": "3.0.8",
     "worker-plugin": "5.0.0",
     "xenocide-world-generator": "https://github.com/duchu-net/xenocide-world-generator#prealpha_0.0.2-rc.1",
